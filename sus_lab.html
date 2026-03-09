@@ -1,0 +1,3063 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Sus Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f3ef;
+  --bg2: #eceae4;
+  --card: #fff;
+  --border: #dddbd5;
+  --text: #1a1a18;
+  --muted: #888880;
+  --faint: #c8c6be;
+  --stabile: #0a5e3a;    --stabile-bg: #d8f0e5;
+  --dominante: #a81800;  --dominante-bg: #fde8e5;
+  --esteso: #2d0e99;     --esteso-bg: #e5e0ff;
+  --politonale: #7a5500; --politonale-bg: #fdf3cc;
+  --double: #333;        --double-bg: #ebebeb;
+  --cluster: #880044;    --cluster-bg: #ffe0f0;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+* { box-sizing: border-box; margin:0; padding:0; }
+body { background:var(--bg); font-family:var(--sans); color:var(--text); min-height:100vh; }
+
+/* ── HEADER ── */
+.header {
+  background:#111; color:#fff; padding:14px 28px;
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+}
+.header h1 { font-family:var(--mono); font-size:13px; letter-spacing:3px; text-transform:uppercase; color:#aaa; font-weight:400; }
+.header h1 b { color:#fff; }
+.controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-left:auto; }
+.ctrl-wrap { display:flex; flex-direction:column; gap:3px; }
+.ctrl-label { font-family:var(--mono); font-size:7px; letter-spacing:2px; text-transform:uppercase; color:#555; }
+select {
+  font-family:var(--mono); font-size:11px; background:#1e1e1e; color:#eee;
+  border:1px solid #333; border-radius:3px; padding:6px 10px; cursor:pointer; min-width:120px;
+}
+select:focus { outline:none; border-color:#666; }
+.play-global {
+  display:flex; gap:6px; align-items:center;
+}
+.pbtn {
+  font-family:var(--mono); font-size:9px; letter-spacing:1px; text-transform:uppercase;
+  border:1px solid #333; border-radius:3px; padding:6px 12px; cursor:pointer;
+  background:#1e1e1e; color:#ccc; transition:all .12s;
+}
+.pbtn:hover { background:#fff; color:#111; border-color:#fff; }
+.pbtn:active { transform:scale(.95); }
+
+/* ── BASE CHORD DISPLAY ── */
+.base-bar {
+  background:#fff; border-bottom:1px solid var(--border);
+  padding:14px 28px; display:flex; gap:32px; align-items:center; flex-wrap:wrap;
+}
+.base-name { font-family:var(--mono); font-size:22px; font-weight:700; }
+.base-sub  { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:2px; }
+.base-notes-row { display:flex; gap:8px; align-items:center; }
+.note-pill {
+  font-family:var(--mono); font-size:10px; font-weight:600;
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:20px; padding:3px 10px;
+}
+.note-pill.bass { background:#111; color:#fff; border-color:#111; }
+.quality-tag {
+  font-family:var(--mono); font-size:8px; letter-spacing:1px; text-transform:uppercase;
+  padding:3px 10px; border-radius:10px; font-weight:700;
+}
+
+/* ── TABS ── */
+.tabs-bar {
+  background:var(--bg2); border-bottom:2px solid var(--border);
+  padding:0 28px; display:flex; gap:0; overflow-x:auto;
+}
+.tab {
+  font-family:var(--mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+  padding:12px 18px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent;
+  margin-bottom:-2px; white-space:nowrap; transition:color .12s, border-color .12s;
+}
+.tab:hover { color:var(--text); }
+.tab.active { color:var(--text); border-bottom-color:var(--text); }
+
+/* ── CONTENT ── */
+.content { padding:24px 28px; max-width:1100px; }
+.panel { display:none; }
+.panel.active { display:block; }
+
+.section-label {
+  font-family:var(--mono); font-size:8px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:12px; padding-bottom:6px;
+  border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;
+}
+
+/* ── CARDS ── */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px; margin-bottom:28px; }
+.card {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  border-left:3px solid var(--border); padding:12px 14px;
+  transition:box-shadow .12s;
+}
+.card:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
+.card-label { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:3px; letter-spacing:.5px; }
+.card-note  { font-family:var(--mono); font-size:14px; font-weight:700; margin-bottom:1px; }
+.card-int   { font-family:var(--mono); font-size:8px; color:var(--faint); margin-bottom:7px; }
+.card-chord { font-family:var(--mono); font-size:11px; font-weight:700; margin-bottom:2px; }
+.card-slash { font-family:var(--mono); font-size:9px; color:var(--muted); margin-bottom:6px; }
+.card-notes { font-family:var(--mono); font-size:8px; color:var(--faint); margin-bottom:8px; }
+.card-footer{ display:flex; justify-content:space-between; align-items:center; }
+.ctag {
+  font-family:var(--mono); font-size:7px; letter-spacing:.3px; text-transform:uppercase;
+  padding:2px 7px; border-radius:8px; font-weight:700;
+}
+.card-btns  { display:flex; gap:3px; }
+.cpbtn {
+  font-family:var(--mono); font-size:8px; background:var(--bg2); color:var(--muted);
+  border:1px solid var(--border); border-radius:3px; padding:2px 7px; cursor:pointer; transition:all .1s;
+}
+.cpbtn:hover { background:#111; color:#fff; border-color:#111; }
+
+/* quality border + tag colors */
+.q-stabile    { border-left-color:var(--stabile); }
+.q-dominante  { border-left-color:var(--dominante); }
+.q-esteso     { border-left-color:var(--esteso); }
+.q-politonale { border-left-color:var(--politonale); }
+.q-double     { border-left-color:var(--double); }
+.q-cluster    { border-left-color:var(--cluster); }
+.t-stabile    { background:var(--stabile-bg); color:var(--stabile); }
+.t-dominante  { background:var(--dominante-bg); color:var(--dominante); }
+.t-esteso     { background:var(--esteso-bg); color:var(--esteso); }
+.t-politonale { background:var(--politonale-bg); color:var(--politonale); }
+.t-double     { background:var(--double-bg); color:var(--double); }
+.t-cluster    { background:var(--cluster-bg); color:var(--cluster); }
+
+/* ── CADENCE SECTION ── */
+.cadence-block { margin-bottom:32px; }
+.cad-title { font-family:var(--mono); font-size:10px; font-weight:700; margin-bottom:4px; }
+.cad-desc  { font-family:var(--sans); font-size:11px; color:var(--muted); margin-bottom:12px; line-height:1.5; }
+.cad-seq   { display:flex; gap:0; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+.cad-step {
+  background:var(--card); border:1px solid var(--border); border-radius:5px;
+  padding:10px 14px; min-width:120px; position:relative;
+}
+.cad-step.current { border-color:#111; box-shadow:0 0 0 2px #111; }
+.cad-arrow { font-family:var(--mono); font-size:12px; color:var(--faint); padding:0 6px; }
+.cad-step-label { font-family:var(--mono); font-size:8px; color:var(--faint); margin-bottom:3px; }
+.cad-step-name  { font-family:var(--mono); font-size:12px; font-weight:700; margin-bottom:2px; }
+.cad-step-notes { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:6px; }
+.cad-step-btns  { display:flex; gap:4px; }
+.cad-play-seq { margin-top:8px; }
+
+/* ── INVERSIONS ── */
+.inv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; margin-bottom:24px; }
+.inv-card {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  padding:12px 14px; border-left:3px solid #aaa;
+}
+.inv-label { font-family:var(--mono); font-size:8px; color:var(--faint); margin-bottom:3px; }
+.inv-name  { font-family:var(--mono); font-size:13px; font-weight:700; margin-bottom:2px; }
+.inv-notes { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:8px; }
+
+/* ── MUTATIONS ── */
+.mut-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:8px; margin-bottom:24px; }
+.mut-card {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  padding:12px 14px;
+}
+.mut-from { font-family:var(--mono); font-size:8px; color:var(--faint); margin-bottom:4px; }
+.mut-arrow { color:var(--muted); margin:0 4px; }
+.mut-name  { font-family:var(--mono); font-size:12px; font-weight:700; margin-bottom:2px; }
+.mut-notes { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:8px; }
+.mut-delta { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:8px; }
+
+.insight {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  padding:16px 18px; font-size:11.5px; color:#555; line-height:1.7; margin-top:8px;
+}
+.insight b { font-family:var(--mono); font-size:10px; color:#111; }
+
+.mappa-sort.active { background:#fff !important; color:#111 !important; border-color:#fff !important; }
+/* ── CIRCLE TAB ── */
+#circle-svg { display:block; }
+@media (max-width: 700px) {
+  #circle-wrap { grid-template-columns: 1fr !important; }
+}
+.circ-node { cursor:pointer; }
+.circ-node:hover .circ-bg { stroke:#446688 !important; }
+.circ-info-title { font-size:13px; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.circ-notes-badge { background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:1px 8px; font-size:10px; color:var(--muted); }
+.circ-move-row { display:flex; align-items:center; gap:8px; margin:5px 0; font-size:11px; flex-wrap:wrap; }
+.circ-chord-badge { background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:1px 8px; color:#334; font-size:10px; white-space:nowrap; }
+.circ-note-from { color:#a84400; font-weight:bold; }
+.circ-note-to   { color:#0a6644; font-weight:bold; }
+.circ-legend    { margin-top:12px; font-size:9px; color:var(--muted); border-top:1px solid var(--border); padding-top:8px; line-height:1.6; }
+
+
+/* ── PIANO BAR ── */
+#piano-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 20px 6px 16px;
+  z-index: 100;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  height: 72px;
+}
+#piano-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  writing-mode: initial;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#piano-canvas { display: block; flex: 1; height: 56px; cursor: pointer; }
+
+/* Add bottom padding to content so piano bar doesn't cover it */
+.content { padding-bottom: 100px; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1><b>Sus</b> Lab</h1>
+  <div class="controls">
+    <div class="ctrl-wrap">
+      <div class="ctrl-label">Basso</div>
+      <select id="sel-bass"></select>
+    </div>
+    <div class="ctrl-wrap">
+      <div class="ctrl-label">Upper Sus</div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <select id="sel-sus"></select>
+        <button id="btn-flip-sus" title="Alterna struttura: 1-2-5 (sus2) ↔ 1-4-5 (sus4)"
+          style="font-family:var(--mono);font-size:8px;padding:5px 8px;border:1px solid var(--border);border-radius:3px;background:#f5f4f0;cursor:pointer;white-space:nowrap;color:#555;">
+          1·2·5
+        </button>
+      </div>
+    </div>
+    <div class="ctrl-wrap">
+      <div class="ctrl-label">Ottava basso</div>
+      <select id="sel-oct">
+        <option value="2" selected>-2 ottave dal sus</option>
+        <option value="3">-1 ottava dal sus</option>
+      </select>
+    </div>
+    <div class="ctrl-wrap">
+      <div class="ctrl-label">Quinte al basso</div>
+      <select id="sel-fifths">
+        <option value="0" selected>0 (solo basso)</option>
+        <option value="1">1 (+ quinta sotto)</option>
+        <option value="2">2 (+ due quinte)</option>
+        <option value="3">3 (+ tre quinte)</option>
+      </select>
+    </div>
+    <div class="play-global">
+      <button class="pbtn" id="btn-chord">▶ Accordo</button>
+      <button class="pbtn" id="btn-arp">⤵ Arpeggio</button>
+    </div>
+  </div>
+</div>
+
+<!-- BASE CHORD BAR -->
+<div class="base-bar" id="base-bar"></div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab active" data-tab="added">+ Nota aggiunta</div>
+  <div class="tab" data-tab="mutations">Mutazioni sus</div>
+  <div class="tab" data-tab="inversions">Inversioni</div>
+  <div class="tab" data-tab="cadences">Cadenze</div>
+  <div class="tab" data-tab="circle">Cerchio</div>
+  <div class="tab" data-tab="mappa">Mappa</div>
+  <div class="tab" data-tab="decomp">Decomposizione</div>
+  <div class="tab" data-tab="distanza">Distanza</div>
+  <div class="tab" data-tab="scala">Scala</div>
+  <div class="tab" data-tab="modulazione">Modulazione</div>
+</div>
+
+<div class="content">
+  <!-- TAB: NOTE AGGIUNTA -->
+  <div class="panel active" id="tab-added">
+    <div class="section-label" id="lbl-double">▸ Completano un secondo sus</div>
+    <div class="grid" id="grid-double"></div>
+    <div class="section-label" id="lbl-others">▸ Altre note</div>
+    <div class="grid" id="grid-others"></div>
+    <div class="insight" id="insight-added"></div>
+  </div>
+
+  <!-- TAB: MUTAZIONI -->
+  <div class="panel" id="tab-mutations">
+    <div class="section-label">▸ Cambia 1 nota del sus (±1 semitono)</div>
+    <div class="mut-grid" id="grid-mut1"></div>
+    <div class="section-label">▸ Cambia 2 note del sus (±1 semitono)</div>
+    <div class="mut-grid" id="grid-mut2"></div>
+    <div class="section-label">▸ Triadi — sposta note del sus verso triadi vicine</div>
+    <div class="mut-grid" id="grid-triads"></div>
+  </div>
+
+  <!-- TAB: INVERSIONI -->
+  <div class="panel" id="tab-inversions">
+    <div class="section-label">▸ Ogni nota dell'accordo come basso</div>
+    <div class="inv-grid" id="grid-inv"></div>
+    <div class="insight" id="insight-inv"></div>
+  </div>
+
+  <!-- TAB: CADENZE -->
+  <div class="panel" id="tab-cadences">
+    <div id="cad-content"></div>
+  </div>
+
+  <!-- TAB: MAPPA -->
+  <div class="panel" id="tab-mappa">
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Basso</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pbtn mappa-sort active" id="mappa-chrom" style="font-size:8px;padding:5px 10px;">Cromatico</button>
+          <button class="pbtn mappa-sort" id="mappa-cof" style="font-size:8px;padding:5px 10px;">Cerchio 5e</button>
+        </div>
+      </div>
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Sus (colonne)</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pbtn mappa-sort" id="mappa-sus-chrom" style="font-size:8px;padding:5px 10px;">Cromatico</button>
+          <button class="pbtn mappa-sort active" id="mappa-sus-cof" style="font-size:8px;padding:5px 10px;">Cerchio 5e</button>
+        </div>
+      </div>
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Vista</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pbtn mappa-sort active" id="mappa-view-normal" style="font-size:8px;padding:5px 10px;">Normale</button>
+          <button class="pbtn mappa-sort" id="mappa-view-parallel" style="font-size:8px;padding:5px 10px;">Parallela</button>
+        </div>
+      </div>
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Suona al click</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pbtn mappa-sort active" id="mappa-mode-off"  style="font-size:8px;padding:5px 10px;">Off</button>
+          <button class="pbtn mappa-sort"        id="mappa-mode-sus"  style="font-size:8px;padding:5px 10px;">Forma sus</button>
+          <button class="pbtn mappa-sort"        id="mappa-mode-vl"   style="font-size:8px;padding:5px 10px;">Voice leading</button>
+        </div>
+        <button class="pbtn" id="mappa-reset-vl" style="font-size:8px;padding:5px 10px;opacity:0.4;pointer-events:none;" title="Azzera memoria voice leading">↺ reset VL</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <canvas id="mappa-canvas" style="display:block;"></canvas>
+    </div>
+  </div>
+
+  <!-- TAB: CERCHIO -->
+  <div class="panel" id="tab-circle">
+    <div id="circle-wrap" style="display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start;">
+      <svg id="circle-svg" viewBox="0 0 580 580" style="cursor:default;width:100%;height:auto;display:block;"></svg>
+      <div id="circle-info" style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:16px 18px;min-height:200px;font-family:var(--mono);font-size:11px;"></div>
+    </div>
+  </div>
+
+  <!-- TAB: DECOMPOSIZIONE -->
+  <div class="panel" id="tab-decomp">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Note accordo</div>
+        <input id="decomp-input" type="text" placeholder="es. C Eb G Bb F"
+          style="font-family:var(--mono);font-size:11px;padding:6px 10px;border:1px solid var(--border);border-radius:3px;background:#fff;width:200px;">
+        <button class="pbtn" id="decomp-btn" style="font-size:8px;padding:6px 12px;">Analizza</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">oppure usa basso+sus selezionato sopra → <button class="pbtn" id="decomp-from-sel" style="font-size:8px;padding:4px 8px;">Usa selezione</button></div>
+    </div>
+    <div class="section-label" id="decomp-label">▸ Coppie di sus che coprono l'accordo</div>
+    <div class="grid" id="decomp-grid"></div>
+    <div class="insight" id="decomp-insight" style="display:none"></div>
+  </div>
+
+  <!-- TAB: DISTANZA -->
+  <div class="panel" id="tab-distanza">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Vista</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pbtn mappa-sort active" id="dist-mode-sus" style="font-size:8px;padding:5px 10px;">Famiglie sus</button>
+          <button class="pbtn mappa-sort" id="dist-mode-chord" style="font-size:8px;padding:5px 10px;">Con basso (vs selezione)</button>
+        </div>
+      </div>
+      <div id="dist-desc" style="font-family:var(--mono);font-size:9px;color:var(--muted);">
+        Note in comune tra coppie di famiglie sus. Click per sentire.
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <canvas id="dist-canvas" style="display:block;"></canvas>
+    </div>
+  </div>
+
+  <!-- TAB: SCALA -->
+  <div class="panel" id="tab-scala">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Tonica</div>
+        <select id="scala-root" style="min-width:80px;"></select>
+      </div>
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Modo</div>
+        <select id="scala-mode" style="min-width:180px;"></select>
+      </div>
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Vista</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pbtn mappa-sort active" id="scala-view-sus" style="font-size:8px;padding:5px 10px;">Famiglie sus</button>
+          <button class="pbtn mappa-sort" id="scala-view-chord" style="font-size:8px;padding:5px 10px;">Con basso</button>
+        </div>
+      </div>
+    </div>
+    <div id="scala-sus-view">
+      <div class="section-label" id="scala-label">▸ Sus contenuti nella scala</div>
+      <div class="grid" id="scala-in-grid"></div>
+      <div class="section-label" id="scala-out-label" style="margin-top:16px">▸ Fuori scala</div>
+      <div class="grid" id="scala-out-grid"></div>
+    </div>
+    <div id="scala-chord-view" style="display:none;">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+        <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:6px;">
+          <div class="ctrl-label" style="color:var(--text)">Basso</div>
+          <button class="pbtn mappa-sort active" id="scala-bass-chrom" style="font-size:8px;padding:5px 9px;">Cromatico</button>
+          <button class="pbtn mappa-sort" id="scala-bass-cof" style="font-size:8px;padding:5px 9px;">Cerchio 5e</button>
+        </div>
+        <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:6px;">
+          <div class="ctrl-label" style="color:var(--text)">Sus</div>
+          <button class="pbtn mappa-sort" id="scala-sus-chrom" style="font-size:8px;padding:5px 9px;">Cromatico</button>
+          <button class="pbtn mappa-sort active" id="scala-sus-cof" style="font-size:8px;padding:5px 9px;">Cerchio 5e</button>
+        </div>
+        <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:6px;">
+          <div class="ctrl-label" style="color:var(--text)">Fuori scala</div>
+          <button class="pbtn mappa-sort" id="scala-show-out" style="font-size:8px;padding:5px 9px;">Separati</button>
+          <button class="pbtn mappa-sort active" id="scala-hide-out" style="font-size:8px;padding:5px 9px;">Integrati</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <canvas id="scala-canvas" style="display:block;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: MODULAZIONE -->
+  <div class="panel" id="tab-modulazione">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">Da</div>
+        <select id="mod-from" style="min-width:140px;"></select>
+      </div>
+      <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="ctrl-label" style="color:var(--text)">A</div>
+        <select id="mod-to" style="min-width:140px;"></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
+      <div class="ctrl-label" style="color:var(--text)">Percorso</div>
+      <button class="pbtn mappa-sort active" id="mod-interval-7" data-interval="7" style="font-size:8px;padding:5px 9px;">P5 ↻</button>
+      <button class="pbtn mappa-sort" id="mod-interval-5" data-interval="5" style="font-size:8px;padding:5px 9px;">P4 ↻</button>
+      <button class="pbtn mappa-sort" id="mod-interval-2" data-interval="2" style="font-size:8px;padding:5px 9px;">M2 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-10" data-interval="10" style="font-size:8px;padding:5px 9px;">m7 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-3" data-interval="3" style="font-size:8px;padding:5px 9px;">m3 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-9" data-interval="9" style="font-size:8px;padding:5px 9px;">M6 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-4" data-interval="4" style="font-size:8px;padding:5px 9px;">M3 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-8" data-interval="8" style="font-size:8px;padding:5px 9px;">m6 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-6" data-interval="6" style="font-size:8px;padding:5px 9px;">TT ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-1" data-interval="1" style="font-size:8px;padding:5px 9px;">m2 ↑</button>
+      <button class="pbtn mappa-sort" id="mod-interval-11" data-interval="11" style="font-size:8px;padding:5px 9px;">M7 ↑</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="mod-path-btns"></div>
+    <div id="mod-content"></div>
+  </div>
+
+</div>
+
+<!-- PIANO PREVIEW (fixed bottom) -->
+<div id="piano-bar">
+  <div id="piano-label">Piano</div>
+  <canvas id="piano-canvas"></canvas>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CORE DATA
+// ═══════════════════════════════════════════════════════════════
+const NOTE = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const FAM  = [
+  {r2:'C',r4:'G'},{r2:'C#',r4:'G#'},{r2:'D',r4:'A'},{r2:'D#',r4:'A#'},
+  {r2:'E',r4:'B'},{r2:'F',r4:'C'},{r2:'F#',r4:'C#'},{r2:'G',r4:'D'},
+  {r2:'G#',r4:'D#'},{r2:'A',r4:'E'},{r2:'A#',r4:'F'},{r2:'B',r4:'F#'},
+];
+const INT_NAME = {0:'R',1:'b9',2:'9',3:'m3',4:'M3',5:'P4',6:'#11/b5',7:'P5',8:'b6',9:'M6/13',10:'b7',11:'M7'};
+
+let susFourMode = false; // false=1-2-5, true=1-4-5
+
+function getSusNotes(fi){
+  const r=NOTE.indexOf(FAM[fi].r2);
+  return susFourMode ? [r,(r+5)%12,(r+7)%12] : [r,(r+2)%12,(r+7)%12];
+}
+function famOfRoot(root){return FAM.findIndex(f=>f.r2===NOTE[root]);}
+function intOf(bass,fi){return(NOTE.indexOf(FAM[fi].r2)-bass+12)%12;}
+
+function chordName(bass,fi){
+  if(fi<0||fi>=FAM.length) return null;
+  const f=FAM[fi],i=intOf(bass,fi),B=NOTE[bass],SR=f.r2,S4=f.r4;
+  if(!susFourMode){
+    // 1-2-5 mode: [root, M2, P5]
+    switch(i){
+      case 0: return SR+'sus2';
+      case 1: return NOTE[(bass+3)%12]+'7 11 13/'+B;
+      case 2: return B+'6/9';
+      case 3: return B+'min11';
+      case 4: return B+'maj7#11';
+      case 5: return B+'sus4';
+      case 6: return S4+'maj7sus4/'+B;
+      case 7: return B+'6sus2';
+      case 8: return SR+'maj/'+B;
+      case 9: return B+'maj13';
+      case 10: return B+'7sus4';
+      case 11: return S4+'sus4 b9#11/'+B;
+    }
+  } else {
+    // 1-4-5 mode: [root, P4, P5]
+    // i = interval from bass to sus root
+    switch(i){
+      case 0: return SR+'sus4';                         // C,F,G  → Csus4
+      case 1: return SR+'sus4/'+B;                      // b2 bass → polytonal
+      case 2: return B+'6sus2';                         // Bb,C,F,G → Bb6sus2 (same intervals 0,2,7,9)
+      case 3: return SR+'sus4/'+B;                      // A,C,F,G → exotic
+      case 4: return B+'maj13(no5)';                    // Ab,C,F,G → Abmaj13
+      case 5: return B+'7sus4';                         // G,C,F,G → G7sus4 (classic!)
+      case 6: return SR+'sus4/'+B;                      // F#,C,F,G → polytonal
+      case 7: return B+'sus2';                          // F,C,F,G = F,G,C → Fsus2 (dual reading!)
+      case 8: return SR+'sus4/'+B;                      // E,C,F,G → exotic
+      case 9: return B+'6/9';                           // Eb,C,F,G → Eb6/9(no3,no5)
+      case 10: return B+'m11';                          // D,C,F,G → Dm11 (0,b7,m3,P4)
+      case 11: return B+'maj7♯11';                 // C#,C,F,G → C#maj7#11
+    }
+  }
+}
+
+function quality(i){
+  if(!susFourMode){
+    if([0,2,5,7].includes(i)) return 'stabile';
+    if([1,10].includes(i)) return 'dominante';
+    if([3,4,9].includes(i)) return 'esteso';
+    return 'politonale';
+  } else {
+    // 1-4-5 quality map
+    if([0,7,2].includes(i)) return 'stabile';   // sus4, sus2(dual), 6sus2
+    if([5].includes(i)) return 'dominante';      // 7sus4
+    if([4,9,10,11].includes(i)) return 'esteso'; // maj13, 6/9, m11, maj7#11
+    return 'politonale';
+  }
+}
+
+const TEMPLATES=[
+  {i:'0,2,7,9',n:'6sus2'},{i:'0,2,7,10',n:'7sus2'},{i:'0,2,7,11',n:'maj7sus2'},
+  {i:'0,5,7,9',n:'6sus4'},{i:'0,5,7,10',n:'7sus4'},{i:'0,5,7,11',n:'maj7sus4'},
+  {i:'0,2,5,7',n:'sus2+4'},{i:'0,4,7,10',n:'7'},{i:'0,4,7,11',n:'maj7'},
+  {i:'0,3,7,10',n:'m7'},{i:'0,3,7,11',n:'mMaj7'},{i:'0,4,7,9',n:'6'},
+  {i:'0,3,7,9',n:'m6'},{i:'0,2,4,7',n:'add9'},{i:'0,3,5,7',n:'madd11'},
+  {i:'0,4,6,10',n:'7#11'},{i:'0,4,6,11',n:'maj7#11'},{i:'0,3,6,10',n:'ø7'},
+  {i:'0,3,6,9',n:'dim7'},{i:'0,4,8,10',n:'7#5'},{i:'0,1,7,10',n:'7b9(no3)'},
+  {i:'0,6,7,10',n:'7#11(no3)'},{i:'0,2,6,10',n:'7sus2#11'},{i:'0,1,5,7',n:'sus4b9'},
+  {i:'0,4,9,10',n:'13(no5)'},{i:'0,2,4,10',n:'9(no5)'},
+  {i:'0,2,4,9,10',n:'13'},{i:'0,2,4,7,10',n:'9'},{i:'0,2,4,7,11',n:'maj9'},
+  {i:'0,2,7,9,10',n:'13sus2'},{i:'0,5,7,9,10',n:'13sus4'},{i:'0,2,5,7,10',n:'11'},
+  {i:'0,3,7,9,10',n:'m13'},{i:'0,2,3,7,10',n:'m9'},{i:'0,4,6,9,10',n:'13#11'},
+  {i:'0,2,4,6,11',n:'maj9#11'},{i:'0,2,4,6,10',n:'9#11'},{i:'0,3,5,7,10',n:'m11'},
+  {i:'0,4,7,9,11',n:'maj13'},{i:'0,2,4,7,9',n:'6/9'},
+];
+
+function identifySet(bass, noteSet){
+  const uniq=[...new Set(noteSet)];
+  const ints=uniq.map(n=>(n-bass+12)%12).sort((a,b)=>a-b);
+  const key=ints.join(',');
+  for(const t of TEMPLATES) if(t.i===key) return NOTE[bass]+t.n;
+  // check sus
+  for(let f=0;f<12;f++){
+    const fn=getSusNotes(f);
+    if(fn.every(n=>uniq.includes(n))&&uniq.every(n=>fn.includes(n))) return FAM[f].r2+'sus';
+  }
+  const suffix=ints.filter(i=>i>0).map(i=>INT_NAME[i]||'?').join(' ');
+  return NOTE[bass]+'('+suffix+')';
+}
+
+function hasCluster(notes, bass){
+  const ints=notes.map(n=>(n-bass+12)%12).sort((a,b)=>a-b);
+  for(let i=0;i<ints.length-1;i++) if(ints[i+1]-ints[i]<=1) return true;
+  return false;
+}
+
+function identifyAdded(bass, susNotes, added){
+  const all=[bass,...susNotes,added].filter((v,i,a)=>a.indexOf(v)===i);
+  // double sus?
+  for(let f=0;f<12;f++){
+    const fn=getSusNotes(f);
+    if(fn.every(n=>all.includes(n))&&!fn.every(n=>susNotes.includes(n)))
+      return{type:'double', chord:FAM[f].r2+'sus2 + '+FAM[FAM.findIndex(x=>x.r2===NOTE[susNotes[0]])].r2+'sus2', tag:'double sus'};
+  }
+  const name=identifySet(bass,all);
+  // quality from name
+  let t='esteso';
+  if(/sus[24]$/.test(name)&&!/7sus|msus/.test(name)) t='stabile';
+  else if(/^.*6(sus|\/9)/.test(name)) t='stabile';
+  else if(/7(?!sus|maj)|dim|ø|#5/.test(name)) t='dominante';
+  else if(hasCluster(all,bass)) t='cluster';
+  return{type:t, chord:name, tag:t};
+}
+
+function qColor(q){
+  return{stabile:'var(--stabile)',dominante:'var(--dominante)',esteso:'var(--esteso)',
+    politonale:'var(--politonale)',double:'var(--double)',cluster:'var(--cluster)'}[q]||'#888';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════════════════════
+let ctx=null;
+function getCtx(){
+  if(!ctx) ctx=new(window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+function noteFreq(idx,oct=4){return 440*Math.pow(2,((oct*12+12)+idx-69)/12);}
+
+function playNote(idx,oct=4,t0=0,vel=0.55){
+  const c=getCtx(); const freq=noteFreq(idx,oct); const t=c.currentTime+t0;
+  const m=c.createGain();
+  m.gain.setValueAtTime(0,t);
+  m.gain.linearRampToValueAtTime(vel*0.32,t+0.007);
+  m.gain.exponentialRampToValueAtTime(vel*0.16,t+0.25);
+  m.gain.exponentialRampToValueAtTime(0.001,t+2.8);
+  m.connect(c.destination);
+
+  const isBass = oct <= 3;
+  [[1,1.0,'triangle'],[2,0.45,'sine'],[3,0.22,'sine'],[4,0.1,'sine'],[5,0.05,'sine']].forEach(([h,a,tp])=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.type=tp; o.frequency.setValueAtTime(freq*h,t);
+    o.detune.setValueAtTime((Math.random()-.5)*3,t);
+    g.gain.setValueAtTime(a,t); g.gain.exponentialRampToValueAtTime(0.001,t+2.2/h);
+    o.connect(g); g.connect(m); o.start(t); o.stop(t+3);
+  });
+
+  // Light sub for bass notes
+  if(isBass){
+    const sub=c.createOscillator(), subG=c.createGain();
+    sub.type='sine'; sub.frequency.setValueAtTime(freq,t);
+    subG.gain.setValueAtTime(vel*0.25,t);
+    subG.gain.exponentialRampToValueAtTime(0.001,t+2.2);
+    sub.connect(subG); subG.connect(m); sub.start(t); sub.stop(t+2.5);
+  }
+
+  // Attack click
+  const cl=c.createOscillator(),cg=c.createGain();
+  cl.frequency.setValueAtTime(freq*.5,t); cl.type='sawtooth';
+  cg.gain.setValueAtTime(vel*.12,t); cg.gain.exponentialRampToValueAtTime(0.001,t+0.03);
+  cl.connect(cg); cg.connect(m); cl.start(t); cl.stop(t+0.04);
+  // Highlight piano key (only for immediate notes, not pre-scheduled ones)
+  if(t0===0 && typeof pianoHighlight === 'function')
+    pianoHighlight([{note:idx, oct, vel}], 1800);
+}
+
+// ── VOICING ENGINE ─────────────────────────────────────────────
+// Each voice = {note: 0-11, oct: int}
+// No auto-sorting or auto-octave assignment — caller decides.
+
+// Build standard voicing: bass deep, sus 1-2-5 in upper register
+function buildVoicing(bassIdx, susNotes, addedNote=null, addedPos='above', bassOct=2, fifthStacks=0) {
+  const voices = [];
+  // Bass layer: root + fifths going UP (C→G→D→A), all below sus
+  const bassMidi = bassOct*12 + 12 + bassIdx;
+  for (let s = 0; s <= fifthStacks; s++) {
+    const stackMidi = bassMidi + s*7;
+    const noteIdx = ((stackMidi - 12) % 12 + 12) % 12;
+    const oct = Math.floor((stackMidi - 12) / 12);
+    voices.push({ note: noteIdx, oct, vel: s===0 ? 0.68 : 0.55, bass:true });
+  }
+  // Sus upper layer: place susRoot in oct4, then M2 and P5 above it
+  const susRoot = susNotes[0];
+  const m2     = susNotes[1]; // always 2 semitones above root mod 12
+  const p5     = susNotes[2]; // always 7 semitones above root mod 12
+  const rootOct = 4;
+  voices.push({ note: susRoot, oct: rootOct, vel: 0.55 });
+  voices.push({ note: m2, oct: m2 > susRoot ? rootOct : rootOct + 1, vel: 0.52 });
+  voices.push({ note: p5, oct: p5 > susRoot ? rootOct : rootOct + 1, vel: 0.50 });
+  // Added note
+  if (addedNote !== null) {
+    const topOct = p5 > susRoot ? rootOct : rootOct + 1;
+    const topNote = p5;
+    let oct;
+    if (addedPos === 'above') {
+      // Above highest sus note
+      oct = addedNote >= topNote ? topOct : topOct + 1;
+    } else if (addedPos === 'middle') {
+      // Inside the sus cluster — same octave as sus root, let it sit among the 3 notes
+      oct = addedNote >= susRoot ? rootOct : rootOct + 1;
+    } else {
+      // Below sus root, between bass and sus
+      oct = addedNote >= susRoot ? rootOct - 1 : rootOct;
+    }
+    voices.push({ note: addedNote, oct, vel: 0.53 });
+  }
+  return voices;
+}
+
+// Build inversion voicing: chosen note as bass deep, rest in upper position
+function buildInvVoicing(invBass, allNotes, bassOct=2, fifthStacks=0) {
+  const voices = [];
+  // Bass layer: root + fifths going UP (C→G→D→A)
+  const bassMidi = bassOct*12 + 12 + invBass;
+  for (let s = 0; s <= fifthStacks; s++) {
+    const stackMidi = bassMidi + s*7;
+    const noteIdx = ((stackMidi - 12) % 12 + 12) % 12;
+    const oct = Math.floor((stackMidi - 12) / 12);
+    voices.push({ note: noteIdx, oct, vel: s===0 ? 0.68 : 0.55, bass:true });
+  }
+  // Upper notes: all notes except bass, placed ascending from oct4
+  const upper = allNotes.filter(n => n !== invBass);
+  // Sort to place them ascending from a reference point
+  upper.sort((a,b)=>a-b);
+  let refOct = 4;
+  let prev = -1;
+  upper.forEach(n => {
+    if (n <= prev) refOct++;
+    voices.push({ note: n, oct: refOct, vel: 0.52 });
+    prev = n;
+  });
+  return voices;
+}
+
+function playVoicing(voices, arpeggio=false) {
+  if (arpeggio) {
+    const sorted = [...voices].sort((a,b) => (a.oct*12+a.note) - (b.oct*12+b.note));
+    sorted.forEach((v,i) => playNote(v.note, v.oct, i*0.13, v.vel||0.55));
+  } else {
+    voices.forEach(v => playNote(v.note, v.oct, 0, v.vel||0.55));
+  }
+  // Piano highlight — guard against calling before initPiano
+  if(typeof pianoHighlight === 'function')
+    pianoHighlight(voices, arpeggio ? Math.max(voices.length,3)*160+1000 : 2000);
+}
+
+// Legacy wrappers used by cadences (steps = [{notes, oct}])
+function playSeq(steps, gap=0.7){
+  let t=0;
+  steps.forEach(s=>{
+    s.notes.forEach(n=>playNote(n,s.oct||4,t,0.52));
+    t+=gap;
+  });
+}
+function playArpSeq(steps, noteGap=0.11, stepGap=0.7){
+  let t=0;
+  steps.forEach(s=>{
+    const sorted=[...s.notes].sort((a,b)=>a-b);
+    sorted.forEach((n,i)=>playNote(n,i===0?(s.oct||4)-1:(s.oct||4),t+i*noteGap,0.55));
+    t+=stepGap;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let curBass=10, curFam=0;
+let curBaseNotes=[];
+let curBassOct=2, curFifths=0;
+let curSusNotes=[];
+
+// ═══════════════════════════════════════════════════════════════
+// SELECTORS
+// ═══════════════════════════════════════════════════════════════
+const selBass=document.getElementById('sel-bass');
+const selSus=document.getElementById('sel-sus');
+NOTE.forEach((n,i)=>{const o=document.createElement('option');o.value=i;o.textContent=n;selBass.appendChild(o);});
+FAM.forEach((f,i)=>{const o=document.createElement('option');o.value=i;o.textContent=f.r2+'sus  ('+f.r2+'sus2 / '+f.r4+'sus4)';selSus.appendChild(o);});
+selBass.value=10; selSus.value=0;
+
+const selOct    = document.getElementById('sel-oct');
+const selFifths = document.getElementById('sel-fifths');
+selOct.addEventListener('change',   ()=>{ curBassOct=parseInt(selOct.value); render(); });
+selFifths.addEventListener('change',()=>{ curFifths=parseInt(selFifths.value); render(); });
+
+document.getElementById('btn-chord').addEventListener('click',()=>{
+  const v = (mappaPlayMode==='vl' && _lastUpperVoices)
+    ? buildVLVoicing(curBass,curSusNotes,curBassOct,curFifths)
+    : buildVoicing(curBass,curSusNotes,null,'above',curBassOct,curFifths);
+  playVoicing(v,false);
+});
+document.getElementById('btn-arp').addEventListener('click',()=>{
+  const v = (mappaPlayMode==='vl' && _lastUpperVoices)
+    ? buildVLVoicing(curBass,curSusNotes,curBassOct,curFifths)
+    : buildVoicing(curBass,curSusNotes,null,'above',curBassOct,curFifths);
+  playVoicing(v,true);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab==='mappa') drawMappa();
+    if(tab.dataset.tab==='distanza') drawDistanza();
+    if(tab.dataset.tab==='scala') renderScala();
+    if(tab.dataset.tab==='modulazione') renderModulazione();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// CARD BUILDERS
+// ═══════════════════════════════════════════════════════════════
+function makeAddedCard(bass, susNotes, added){
+  const res=identifyAdded(bass,susNotes,added);
+  const q=res.type; const qc=qColor(q);
+  const intv=(added-bass+12)%12;
+  const allNotes=[bass,...susNotes,added].filter((v,i,a)=>a.indexOf(v)===i);
+  const notesStr=allNotes.map(n=>NOTE[n]).join(' ');
+  let addedPos='middle'; // 'above' | 'middle' | 'below'
+  const d=document.createElement('div');
+  d.className='card q-'+q;
+  function updateCard(){
+    const posLabel = addedPos==='above'?'↑ sopra' : addedPos==='middle'?'↔ in mezzo':'↓ sotto';
+    // Build actual voicing and show notes in real pitch order (low→high)
+    const voices = buildVoicing(bass, susNotes, added, addedPos, curBassOct, curFifths);
+    const sortedV = [...voices].sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note));
+    const pitchStr = sortedV.map(v=>{
+      const nm = NOTE[v.note]+v.oct;
+      if(v.note===added) return '['+nm+']';
+      if(v.oct<=3)       return '<'+nm+'>';
+      return nm;
+    }).join(' ');
+    d.innerHTML=`
+      <div class="card-label">+ nota</div>
+      <div class="card-note" style="color:${qc}">${NOTE[added]}</div>
+      <div class="card-int">${INT_NAME[intv]||'?'} dal basso</div>
+      <div class="card-chord" style="color:${qc}">${res.chord}</div>
+      <div class="card-notes" style="font-size:7.5px;letter-spacing:.3px">${pitchStr}</div>
+      <div class="card-footer">
+        <span class="ctag t-${q}">${res.tag}</span>
+        <div class="card-btns">
+          <button class="cpbtn pos-toggle" title="Posizione nota aggiunta">${posLabel}</button>
+          <button class="cpbtn" title="Accordo">▶</button>
+          <button class="cpbtn" title="Arpeggio">⤵</button>
+        </div>
+      </div>`;
+    d.querySelector('.pos-toggle').addEventListener('click',e=>{
+      e.stopPropagation(); addedPos = addedPos==='above'?'middle':addedPos==='middle'?'below':'above'; updateCard();
+    });
+    d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{
+      e.stopPropagation();
+      const v=buildVoicing(bass,susNotes,added,addedPos,curBassOct,curFifths);
+      playVoicing(v,false);
+    });
+    d.querySelectorAll('.cpbtn')[2].addEventListener('click',e=>{
+      e.stopPropagation();
+      const v=buildVoicing(bass,susNotes,added,addedPos,curBassOct,curFifths);
+      playVoicing(v,true);
+    });
+  }
+  updateCard();
+  return d;
+}
+
+function makeInvCard(origNotes, newBass, fi){
+  const name=chordName(newBass,fi)||identifySet(newBass,origNotes);
+  const q=quality(intOf(newBass,fi));
+  const qc=qColor(q);
+  const d=document.createElement('div');
+  d.className='inv-card';
+  d.style.borderLeftColor=qc;
+  const notesStr=origNotes.map(n=>NOTE[n]).join(' ');
+  // Show pitch layout
+  const voicing=buildInvVoicing(newBass,origNotes,curBassOct,curFifths);
+  const pitchStr=voicing.sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note))
+    .map(v=>NOTE[v.note]+v.oct).join(' ');
+  d.innerHTML=`
+    <div class="inv-label">basso: ${NOTE[newBass]}</div>
+    <div class="inv-name" style="color:${qc}">${name}</div>
+    <div class="inv-notes">${notesStr}</div>
+    <div style="font-family:var(--mono);font-size:7.5px;color:var(--faint);margin-bottom:8px">${pitchStr}</div>
+    <div class="card-btns">
+      <button class="cpbtn">▶</button>
+      <button class="cpbtn">⤵</button>
+    </div>`;
+  d.querySelectorAll('.cpbtn')[0].addEventListener('click',e=>{
+    e.stopPropagation();
+    playVoicing(buildInvVoicing(newBass,origNotes,curBassOct,curFifths),false);
+  });
+  d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{
+    e.stopPropagation();
+    playVoicing(buildInvVoicing(newBass,origNotes,curBassOct,curFifths),true);
+  });
+  return d;
+}
+
+function makeMutCard(bass, origSusNotes, newSusNotes, moved, fi){
+  const allOrig=[bass,...origSusNotes].filter((v,i,a)=>a.indexOf(v)===i);
+  const allNew=[bass,...newSusNotes].filter((v,i,a)=>a.indexOf(v)===i);
+  const name=(fi>=0?chordName(bass,fi):null)||identifySet(bass,allNew);
+  const q=fi>=0?quality(intOf(bass,fi)):'esteso';
+  const qc=qColor(q);
+  const movedStr=moved.map(m=>`${NOTE[m.from]}→${NOTE[m.to]}`).join(', ');
+  const notesStr=allNew.map(n=>NOTE[n]).join(' ');
+  const d=document.createElement('div');
+  d.className='mut-card';
+  d.style.borderLeft='3px solid '+qc;
+  d.innerHTML=`
+    <div class="mut-from">${movedStr}</div>
+    <div class="card-chord" style="color:${qc}">${name}</div>
+    <div class="mut-notes">${notesStr}</div>
+    <div class="card-footer">
+      <span class="ctag t-${q}">${q}</span>
+      <div class="card-btns">
+        <button class="cpbtn">▶</button>
+        <button class="cpbtn">⤵</button>
+      </div>
+    </div>`;
+  d.querySelectorAll('.cpbtn')[0].addEventListener('click',e=>{
+    e.stopPropagation();
+    const sn=fi>=0?getSusNotes(fi):newSusNotes;
+    const v=buildVoicing(bass,sn,null,'above',curBassOct,curFifths);
+    playVoicing(v,false);
+  });
+  d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{
+    e.stopPropagation();
+    const sn=fi>=0?getSusNotes(fi):newSusNotes;
+    const v=buildVoicing(bass,sn,null,'above',curBassOct,curFifths);
+    playVoicing(v,true);
+  });
+  return d;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CADENCES
+// ═══════════════════════════════════════════════════════════════
+function buildCadences(bass, fi){
+  const susNotes=getSusNotes(fi);
+  const fam=FAM[fi];
+  const el=document.getElementById('cad-content');
+  el.innerHTML='';
+
+  function cadBlock(title, desc, steps){
+    const div=document.createElement('div');
+    div.className='cadence-block';
+
+    const stepsData=steps.map(s=>{
+      const sn=getSusNotes(s.fi);
+      const all=[s.bass,...sn].filter((v,i,a)=>a.indexOf(v)===i);
+      return{...s, susNotes:sn, all, name:chordName(s.bass,s.fi)};
+    });
+
+    let html=`<div class="cad-title">${title}</div>`;
+    html+=`<div class="cad-desc">${desc}</div>`;
+    html+=`<div class="cad-seq">`;
+    stepsData.forEach((s,i)=>{
+      const isCur=(s.bass===bass&&s.fi===fi);
+      html+=`<div class="cad-step${isCur?' current':''}">
+        <div class="cad-step-label">${NOTE[s.bass]}</div>
+        <div class="cad-step-name">${s.name}</div>
+        <div class="cad-step-notes">${s.all.map(n=>NOTE[n]).join(' ')}</div>
+        <div class="cad-step-btns">
+          <button class="cpbtn" data-step="${i}" data-mode="chord">▶</button>
+          <button class="cpbtn" data-step="${i}" data-mode="arp">⤵</button>
+        </div>
+      </div>`;
+      if(i<stepsData.length-1) html+=`<div class="cad-arrow">→</div>`;
+    });
+    html+=`</div>`;
+    html+=`<div class="cad-play-seq" style="display:flex;gap:6px">
+      <button class="pbtn" style="font-size:8px;padding:5px 12px" data-play-seq="chord">▶ Suona sequenza</button>
+      <button class="pbtn" style="font-size:8px;padding:5px 12px" data-play-seq="arp">⤵ Arpeggia sequenza</button>
+    </div>`;
+
+    div.innerHTML=html;
+
+    // wire individual step buttons
+    div.querySelectorAll('[data-step]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const i=parseInt(btn.dataset.step);
+        const m=btn.dataset.mode;
+        const s=stepsData[i];
+        const sn=getSusNotes(s.fi);
+        const v=buildVoicing(s.bass,sn,null,'above',curBassOct,curFifths);
+        playVoicing(v, m==='arp');
+      });
+    });
+    // wire sequence buttons
+    div.querySelectorAll('[data-play-seq]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const m=btn.dataset.playSeq;
+        const arp=(m==='arp');
+        let t=0;
+        stepsData.forEach(s=>{
+          const sn=getSusNotes(s.fi);
+          const v=buildVoicing(s.bass,sn,null,'above',curBassOct,curFifths);
+          if(arp){
+            const sorted=[...v].sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note));
+            sorted.forEach((vv,i)=>playNote(vv.note,vv.oct,t+i*0.11,vv.vel||0.55));
+          } else {
+            v.forEach(vv=>playNote(vv.note,vv.oct,t,vv.vel||0.52));
+          }
+          t+=0.85;
+        });
+      });
+    });
+
+    el.appendChild(div);
+  }
+
+  // ── 1. BASSO CROMATICO (sus fisso) ──────────────────────────
+  const chromBass=[];
+  for(let i=0;i<12;i++) chromBass.push({bass:(bass+i)%12, fi});
+  cadBlock(
+    '1 — Basso cromatico (sus fisso)',
+    `Il sus rimane ${fam.r2}sus, il basso scende cromaticamente da ${NOTE[bass]}. Il nome dell'accordo cambia a ogni semitono.`,
+    chromBass.slice(0,7)
+  );
+
+  // ── 2. BASSO A QUINTE (sus fisso) ──────────────────────────
+  const qBass=[];
+  for(let i=0;i<7;i++) qBass.push({bass:(bass+i*7)%12, fi});
+  cadBlock(
+    '2 — Basso a quinte (sus fisso)',
+    `Il sus rimane ${fam.r2}sus, il basso si muove per quinte perfette. Movimento tipico del basso jazz.`,
+    qBass
+  );
+
+  // ── 3. SUS CROMATICO (basso fisso) ─────────────────────────
+  const chromSus=[];
+  for(let i=0;i<7;i++) chromSus.push({bass, fi:(fi+i)%12});
+  cadBlock(
+    '3 — Sus cromatico (basso fisso)',
+    `Il basso rimane ${NOTE[bass]}, il sus scorre cromaticamente. Ogni passo cambia il colore armonico mantenendo il pedale.`,
+    chromSus
+  );
+
+  // ── 4. SUS A QUINTE (basso fisso) ──────────────────────────
+  const qSus=[];
+  for(let i=0;i<7;i++) qSus.push({bass, fi:(fi+i*7)%12});
+  cadBlock(
+    '4 — Sus a quinte (basso fisso)',
+    `Il basso rimane ${NOTE[bass]}, il sus si muove per quinte. Produce una sequenza di qualità armoniche regolare.`,
+    qSus
+  );
+
+  // ── 5. PARALLELI (basso e sus si muovono insieme) ───────────
+  const parallel=[];
+  for(let i=0;i<7;i++) parallel.push({bass:(bass+i)%12, fi:(fi+i)%12});
+  cadBlock(
+    '5 — Moto parallelo cromatico',
+    `Basso e sus si spostano entrambi di un semitono. Il tipo di accordo (intervallo basso-sus) non cambia — solo la tonalità.`,
+    parallel
+  );
+
+  // ── 6. PARALLELI A QUINTE ────────────────────────────────────
+  const parallelQ=[];
+  for(let i=0;i<7;i++) parallelQ.push({bass:(bass+i*7)%12, fi:(fi+i*7)%12});
+  cadBlock(
+    '6 — Moto parallelo per quinte',
+    `Basso e sus si spostano entrambi per quinte. Ciclo armonico classico, tutto il colore rimane invariato.`,
+    parallelQ
+  );
+
+  // ── 7. OBLIQUO: sus si muove, basso sale di m3 ──────────────
+  const oblique=[];
+  for(let i=0;i<6;i++) oblique.push({bass:(bass+i*3)%12, fi:(fi+i)%12});
+  cadBlock(
+    '7 — Obliquo: basso per terze minori, sus cromatico',
+    `Il basso sale di m3, il sus avanza di un semitono. Produce variazione cromatica nel colore.`,
+    oblique
+  );
+
+  // ── 8. TRITONE SUBSTITUTION ───────────────────────────────────
+  const tritone=[
+    {bass, fi},
+    {bass:(bass+6)%12, fi:(fi+6)%12},
+    {bass, fi},
+  ];
+  cadBlock(
+    '8 — Tritono substitute',
+    `${fam.r2}sus/${NOTE[bass]} → sostituto di tritono → ritorno. Il sostituto è a distanza di tritono (6 semitoni) sia nel basso che nel sus.`,
+    tritone
+  );
+
+  // ── 9. CADENZA SUS → TONICA (risoluzione tipica) ─────────────
+  // V7sus4 → I: basso sale di P4, sus scende di M2
+  const vToI=[
+    {bass:(bass+7)%12, fi},          // V bass, same sus → V7sus4
+    {bass, fi:(fi+10)%12},           // orig bass, sus -M2 → might be Imaj or I6/9
+  ];
+  cadBlock(
+    '9 — Sus dominante → tonica',
+    `Dalla quinta (basso) con il sus attuale, ritorno al basso originale con sus un tono sotto. Simula una cadenza V7sus4 → I.`,
+    vToI
+  );
+
+  // ── 10. DECEPTIVE: risolve su bIII ──────────────────────────
+  const deceptive=[
+    {bass:(bass+7)%12, fi},
+    {bass:(bass+3)%12, fi:(fi+3)%12},
+  ];
+  cadBlock(
+    '10 — Cadenza ingannevole (→ bIII)',
+    `Dalla quinta, risoluzione "ingannevole" su una terza minore sopra la tonica. Colore modale, non risolve veramente.`,
+    deceptive
+  );
+
+  // ── 11. CROMATICO SOLO BASSO, sus a passi ───────────────────
+  const chromBassStepSus=[];
+  for(let i=0;i<6;i++) chromBassStepSus.push({bass:(bass+i)%12, fi:(fi+i*2)%12});
+  cadBlock(
+    '11 — Basso cromatico, sus per gradi',
+    `Il basso sale di un semitono per volta, il sus avanza di due famiglie (≈M2). Massima densità cromatica.`,
+    chromBassStepSus
+  );
+
+  // ── 12. PEDALE + SUS A CERCHIO DELLE QUINTE ─────────────────
+  const pedal=[];
+  for(let i=0;i<8;i++) pedal.push({bass, fi:(fi+i*7)%12});
+  cadBlock(
+    '12 — Pedale di basso + sus a quinte',
+    `Basso fisso su ${NOTE[bass]}, sus percorre il cerchio delle quinte in 8 passi.`,
+    pedal
+  );
+
+  // ── 13. MOTO CONTRARIO ───────────────────────────────────────
+  const contrary=[];
+  for(let i=0;i<7;i++) contrary.push({bass:(bass+i)%12, fi:(fi-i+12)%12});
+  cadBlock(
+    '13 — Moto contrario (basso sale, sus scende)',
+    `Il basso sale cromaticamente mentre il sus scende per famiglie. Produce massima tensione voce-controvoce.`,
+    contrary
+  );
+
+  // ── 14. BASSO PER TERZE MINORI ───────────────────────────────
+  const bassm3=[];
+  for(let i=0;i<5;i++) bassm3.push({bass:(bass+i*3)%12, fi});
+  cadBlock(
+    '14 — Basso per terze minori (sus fisso)',
+    `Il basso si sposta per terze minori (ciclo di 4): ${[0,1,2,3].map(i=>NOTE[(bass+i*3)%12]).join('→')}. Sus invariato.`,
+    bassm3
+  );
+
+  // ── 15. BASSO PER TERZE MAGGIORI ─────────────────────────────
+  const bassM3=[];
+  for(let i=0;i<5;i++) bassM3.push({bass:(bass+i*4)%12, fi});
+  cadBlock(
+    '15 — Basso per terze maggiori (sus fisso)',
+    `Il basso si sposta per terze maggiori (ciclo di 3): ${[0,1,2,3].map(i=>NOTE[(bass+i*4)%12]).join('→')}. Sus invariato.`,
+    bassM3
+  );
+
+  // ── 16. TONI INTERI: basso per M2, sus per P5 ───────────────
+  const wholetone=[];
+  for(let i=0;i<7;i++) wholetone.push({bass:(bass+i*2)%12, fi:(fi+i*7)%12});
+  cadBlock(
+    '16 — Toni interi: basso per M2, sus per P5',
+    `Basso sale a gradi interi (M2), sus avanza per quinte. Produce il profilo della scala per toni interi.`,
+    wholetone
+  );
+
+  // ── 17. SUS PEDALE + BASSO A QUINTE ─────────────────────────
+  const susped=[];
+  for(let i=0;i<7;i++) susped.push({bass:(bass+i*7)%12, fi});
+  cadBlock(
+    '17 — Sus pedale + basso a quinte',
+    `Sus fisso su ${fam.r2}, basso percorre il cerchio delle quinte. Inverte la cadenza 4.`,
+    susped
+  );
+
+  // ── 18. CROMATICO DISCENDENTE (entrambi scendono) ────────────
+  const chromDown=[];
+  for(let i=0;i<7;i++) chromDown.push({bass:(bass-i+12)%12, fi:(fi-i+12)%12});
+  cadBlock(
+    '18 — Discesa cromatica parallela',
+    `Basso e sus scendono insieme di un semitono per volta. Stessa qualità armonica, tensione crescente verso il basso.`,
+    chromDown
+  );
+
+  // ── 19. PENDOLO: alternanza di due accordi ───────────────────
+  const pend2a={bass, fi}, pend2b={bass:(bass+7)%12, fi:(fi+7)%12};
+  const pendulum=[pend2a,pend2b,pend2a,pend2b,pend2a,pend2b];
+  cadBlock(
+    '19 — Pendolo: alternanza due accordi a distanza di quinta',
+    `Oscillazione tra ${chordName(bass,fi)} e ${chordName((bass+7)%12,(fi+7)%12)}. Base di molti ostinati modali.`,
+    pendulum
+  );
+
+  // ── 20. RISOLUZIONE CROMATICA SUS → SUS VICINO ───────────────
+  const chromRes=[
+    {bass, fi},
+    {bass:(bass+1)%12, fi:(fi+1)%12},
+    {bass, fi},
+    {bass:(bass-1+12)%12, fi:(fi-1+12)%12},
+    {bass, fi},
+  ];
+  cadBlock(
+    '20 — Cromatismo di ritorno (sus ±1)',
+    `Dal sus corrente, semitono sopra, ritorno; semitono sotto, ritorno. Pattern tipico delle risoluzioni cromatiche sospese.`,
+    chromRes
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  const bass=parseInt(selBass.value);
+  const fi=parseInt(selSus.value);
+  curBass=bass; curFam=fi;
+  const fam=FAM[fi];
+  const susNotes=getSusNotes(fi);
+  const allNotes=[bass,...susNotes].filter((v,i,a)=>a.indexOf(v)===i);
+  curBaseNotes=allNotes;
+  curSusNotes=susNotes;
+  const i=intOf(bass,fi);
+  const q=quality(i);
+  const qc=qColor(q);
+  const name=chordName(bass,fi);
+
+  // BASE BAR
+  const notePills=allNotes.map((n,idx)=>`<span class="note-pill${idx===0?' bass':''}">${NOTE[n]}</span>`).join('');
+  document.getElementById('base-bar').innerHTML=`
+    <div>
+      <div class="base-name" style="color:${qc}">${name}</div>
+      <div class="base-sub">${fam.r2}sus / ${NOTE[bass]}&nbsp;&nbsp;·&nbsp;&nbsp;intervallo: ${INT_NAME[i]||'?'}</div>
+    </div>
+    <div class="base-notes-row">${notePills}</div>
+    <span class="quality-tag t-${q}">${q}</span>`;
+
+  // ── TAB: NOTE AGGIUNTE ──────────────────────────────────────
+  const missing=[]; for(let n=0;n<12;n++) if(!allNotes.includes(n)) missing.push(n);
+  const doubles=[], others=[];
+  missing.forEach(n=>{
+    const res=identifyAdded(bass,susNotes,n);
+    if(res.type==='double') doubles.push(n); else others.push(n);
+  });
+
+  const gd=document.getElementById('grid-double');
+  const go=document.getElementById('grid-others');
+  gd.innerHTML=''; go.innerHTML='';
+  document.getElementById('lbl-double').textContent=`▸ Completano un secondo sus (${doubles.length})`;
+  document.getElementById('lbl-others').textContent=`▸ Altre note aggiungibili (${others.length})`;
+  doubles.forEach(n=>gd.appendChild(makeAddedCard(bass,susNotes,n)));
+  others.forEach(n=>go.appendChild(makeAddedCard(bass,susNotes,n)));
+  document.getElementById('insight-added').innerHTML=`<b>INSIGHT</b><br><br>
+    ${doubles.length} note completano un secondo sus.
+    Delle ${others.length} restanti: 
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='stabile').length} stabili,
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='esteso').length} estese/modali,
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='dominante').length} dominanti,
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='cluster').length} cluster.`;
+
+  // ── TAB: MUTAZIONI ──────────────────────────────────────────
+  const gm1=document.getElementById('grid-mut1');
+  const gm2=document.getElementById('grid-mut2');
+  gm1.innerHTML=''; gm2.innerHTML='';
+
+  // 1-note mutations: each sus note ±1 semitone
+  susNotes.forEach((note,pos)=>{
+    [-1,1].forEach(dir=>{
+      const newNote=(note+dir+12)%12;
+      if(allNotes.includes(newNote)&&newNote!==note) return; // skip if already in chord
+      const newSus=susNotes.map((n,i)=>i===pos?newNote:n);
+      // find if newSus matches a family
+      let matchFi=-1;
+      for(let f=0;f<12;f++){
+        const fn=getSusNotes(f);
+        if(fn.every(n=>newSus.includes(n))&&newSus.every(n=>fn.includes(n))){matchFi=f;break;}
+      }
+      const card=makeMutCard(bass,susNotes,newSus,[{from:note,to:newNote}],matchFi);
+      gm1.appendChild(card);
+    });
+  });
+
+  // 2-note mutations: all pairs of sus notes, each ±1
+  for(let p1=0;p1<susNotes.length;p1++){
+    for(let p2=p1+1;p2<susNotes.length;p2++){
+      [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([d1,d2])=>{
+        const newSus=[...susNotes];
+        newSus[p1]=(susNotes[p1]+d1+12)%12;
+        newSus[p2]=(susNotes[p2]+d2+12)%12;
+        if(new Set(newSus).size<3) return; // skip duplicates
+        let matchFi=-1;
+        for(let f=0;f<12;f++){
+          const fn=getSusNotes(f);
+          if(fn.every(n=>newSus.includes(n))&&newSus.every(n=>fn.includes(n))){matchFi=f;break;}
+        }
+        const moved=[{from:susNotes[p1],to:newSus[p1]},{from:susNotes[p2],to:newSus[p2]}];
+        const card=makeMutCard(bass,susNotes,newSus,moved,matchFi);
+        gm2.appendChild(card);
+      });
+    }
+  }
+
+  // ── TAB: MUTAZIONI — TRIADI ─────────────────────────────────
+  renderTriads(bass, susNotes);
+
+  // ── TAB: MAPPA ──────────────────────────────────────────────
+  // Only redraw if mappa tab is currently visible
+  if(document.getElementById('tab-mappa').classList.contains('active')) drawMappa();
+
+  // ── TAB: INVERSIONI ──────────────────────────────────────────
+  const gi=document.getElementById('grid-inv');
+  gi.innerHTML='';
+  allNotes.forEach(n=>{
+    const card=makeInvCard(allNotes,n,fi);
+    if(n===bass) card.style.border='2px solid #111';
+    gi.appendChild(card);
+  });
+  document.getElementById('insight-inv').innerHTML=`<b>INVERSIONI</b><br><br>
+    L'accordo ${name} ha ${allNotes.length} note e quindi ${allNotes.length} inversioni possibili.
+    Ogni inversione cambia il colore armonico dal punto di vista del basso, mantenendo le stesse note superiori.`;
+
+  // ── TAB: CADENZE ────────────────────────────────────────────
+  buildCadences(bass, fi);
+}
+
+selBass.addEventListener('change',render);
+selSus.addEventListener('change',render);
+
+// sus2↔sus4 structure toggle: 1-2-5 ↔ 1-4-5 (same root, same bass)
+document.getElementById('btn-flip-sus').addEventListener('click',()=>{
+  susFourMode = !susFourMode;
+  const btn = document.getElementById('btn-flip-sus');
+  btn.textContent = susFourMode ? '1·4·5' : '1·2·5';
+  btn.style.background = susFourMode ? '#1e1e1e' : '#f5f4f0';
+  btn.style.color = susFourMode ? '#ccc' : '#555';
+  btn.style.borderColor = susFourMode ? '#555' : 'var(--border)';
+  resetVL();
+  render();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// VOICE LEADING ENGINE
+// ═══════════════════════════════════════════════════════════════
+
+function voiceMidi(v){ return v.oct*12 + 12 + v.note; }
+
+// True voice leading:
+// 1. Common tones (same pitch class in both chords) → keep EXACT octave
+// 2. New tones → find octave closest to a freed prev voice slot
+function voiceLead(prevVoices, newNotes){
+  const result = [];
+  const prevAvail = [...prevVoices]; // pool to draw from
+
+  // Step 1: lock common tones — same note, same octave, zero movement
+  const commonNotes  = newNotes.filter(n => prevVoices.some(v => v.note === n));
+  const newOnlyNotes = newNotes.filter(n => !commonNotes.includes(n));
+
+  commonNotes.forEach(note => {
+    // Among matching prev voices, prefer highest (preserves top voice)
+    const matchIdx = prevAvail.reduce((best, v, i) =>
+      v.note === note && (best === -1 || voiceMidi(v) > voiceMidi(prevAvail[best])) ? i : best, -1);
+    if(matchIdx >= 0){
+      const v = prevAvail.splice(matchIdx, 1)[0];
+      result.push({ note, oct: v.oct, vel: 0.55 });
+    }
+  });
+
+  // Step 2: place new tones as close as possible to remaining prev slots
+  newOnlyNotes.forEach(note => {
+    let bestMidi = null, bestDist = 999, bestPoolIdx = -1;
+    for(let pi = 0; pi < prevAvail.length; pi++){
+      const ref = voiceMidi(prevAvail[pi]);
+      for(const oct of [3, 4, 5]){
+        const midi = oct * 12 + 12 + note;
+        const dist = Math.abs(midi - ref);
+        if(dist < bestDist){ bestDist = dist; bestMidi = midi; bestPoolIdx = pi; }
+      }
+    }
+    if(bestMidi !== null){
+      prevAvail.splice(bestPoolIdx, 1);
+      result.push({ note, oct: Math.floor((bestMidi - 12) / 12), vel: 0.52 });
+    } else {
+      // Fallback: near centre of existing voices
+      const centre = result.length
+        ? result.reduce((s,v) => s + voiceMidi(v), 0) / result.length : 60;
+      let bestO = 4, bestD = 999;
+      for(const oct of [3,4,5]){
+        const d = Math.abs(oct*12+12+note - centre);
+        if(d < bestD){ bestD=d; bestO=oct; }
+      }
+      result.push({ note, oct: bestO, vel: 0.52 });
+    }
+  });
+
+  return result;
+}
+
+// State: last played upper voices (for voice leading)
+let _lastUpperVoices = null;
+
+function buildVLVoicing(bassIdx, susNotes, bassOct, fifthStacks){
+  // Bass layer (fixed)
+  const voices = [];
+  const bassMidi = bassOct*12 + 12 + bassIdx;
+  const bassLayer = [];
+  for(let s=0; s<=fifthStacks; s++){
+    const sm = bassMidi + s*7;
+    const ni = ((sm-12)%12+12)%12;
+    const oct = Math.floor((sm-12)/12);
+    voices.push({note:ni, oct, vel: s===0?0.68:0.55, bass:true});
+    bassLayer.push(ni);
+  }
+  
+  // Upper layer
+  let upperVoices;
+  if(_lastUpperVoices === null){
+    // First time: use standard 1-2-5 shape at oct4
+    const sr = susNotes[0], m2 = susNotes[1], p5 = susNotes[2];
+    upperVoices = [
+      {note:sr, oct:4, vel:0.55},
+      {note:m2, oct: m2>sr?4:5, vel:0.52},
+      {note:p5, oct: p5>sr?4:5, vel:0.50},
+    ];
+  } else {
+    upperVoices = voiceLead(_lastUpperVoices, susNotes);
+  }
+  
+  _lastUpperVoices = upperVoices;
+  return [...voices, ...upperVoices];
+}
+
+function resetVL(){ _lastUpperVoices = null; }
+
+
+// ═══════════════════════════════════════════════════════════════
+// TRIADS
+// ═══════════════════════════════════════════════════════════════
+const TRIADS = [
+  {name:'maj', intervals:[0,4,7], label:'maj'},
+  {name:'min', intervals:[0,3,7], label:'min'},
+  {name:'dim', intervals:[0,3,6], label:'dim'},
+  {name:'aug', intervals:[0,4,8], label:'aug'},
+  {name:'sus2',intervals:[0,2,7], label:'sus2'},
+  {name:'sus4',intervals:[0,5,7], label:'sus4'},
+];
+
+function makeTriadCard(bass, origSusNotes, root, triad){
+  const triadNotes = triad.intervals.map(i=>(root+i)%12);
+  const allNew = [bass,...triadNotes].filter((v,i,a)=>a.indexOf(v)===i);
+  const moved = [];
+  origSusNotes.forEach(n=>{ if(!triadNotes.includes(n)) moved.push({from:n,to:null}); });
+  triadNotes.forEach(n=>{ if(!origSusNotes.includes(n)) moved.push({from:null,to:n}); });
+  const movedStr = moved.map(m=> m.from===null?`+${NOTE[m.to]}`:m.to===null?`-${NOTE[m.from]}`:`${NOTE[m.from]}→${NOTE[m.to]}`).join(' ');
+  const name = NOTE[root] + triad.label + (bass!==root?'/'+NOTE[bass]:'');
+  
+  // distance = semitones changed
+  const dist = origSusNotes.filter(n=>!triadNotes.includes(n)).length;
+  const qc = triad.name==='maj'?'#0a5e3a':triad.name==='min'?'#2d0e99':triad.name==='dim'?'#a81800':triad.name==='aug'?'#7a5500':'#555';
+
+  const d = document.createElement('div');
+  d.className = 'mut-card';
+  d.style.borderLeft = '3px solid '+qc;
+  d.innerHTML = `
+    <div class="mut-from" style="font-size:7.5px">${movedStr}</div>
+    <div class="card-chord" style="color:${qc};font-size:12px">${name}</div>
+    <div class="mut-notes">${NOTE[root]} ${triadNotes.map(n=>NOTE[n]).join(' ')}</div>
+    <div class="card-footer">
+      <span class="ctag" style="background:#f0f0f0;color:#555">${triad.label} (${dist} note cambiate)</span>
+      <div class="card-btns">
+        <button class="cpbtn">▶</button>
+        <button class="cpbtn">⤵</button>
+      </div>
+    </div>`;
+
+  function playTriad(arp){
+    // bass deep + triad in upper oct
+    const voices = [];
+    const bassMidi = curBassOct*12+12+bass;
+    for(let s=0;s<=curFifths;s++){
+      const sm=bassMidi+s*7;
+      voices.push({note:((sm-12)%12+12)%12, oct:Math.floor((sm-12)/12), vel:s===0?0.68:0.55, bass:true});
+    }
+    triadNotes.forEach((n,i)=>{
+      const oct = n>=root ? 4 : 5;
+      voices.push({note:n, oct, vel:0.52});
+    });
+    playVoicing(voices, arp);
+  }
+  d.querySelectorAll('.cpbtn')[0].addEventListener('click',e=>{e.stopPropagation();playTriad(false);});
+  d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{e.stopPropagation();playTriad(true);});
+  return d;
+}
+
+function renderTriads(bass, susNotes){
+  const gt = document.getElementById('grid-triads');
+  gt.innerHTML = '';
+  // For each possible triad root, find triads that share ≥1 note with current sus
+  for(let root=0; root<12; root++){
+    TRIADS.forEach(triad=>{
+      const triadNotes = triad.intervals.map(i=>(root+i)%12);
+      const shared = triadNotes.filter(n=>susNotes.includes(n)).length;
+      if(shared >= 1){ // at least 1 shared note = close mutation
+        const card = makeTriadCard(bass, susNotes, root, triad);
+        gt.appendChild(card);
+      }
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAPPA CANVAS
+// ═══════════════════════════════════════════════════════════════
+let mappaBassCOF = false;
+let mappaPlayMode = 'off'; // 'off' | 'sus' | 'vl'
+let mappaSusCOF = true; // true=cerchio5e, false=cromatico
+let mappaParallel = false; // true=parallel (rows=chord type, cols=transposition)
+
+const BASS_CHROM = [0,1,2,3,4,5,6,7,8,9,10,11];
+const BASS_COF_ORDER = [0,7,2,9,4,11,6,1,8,3,10,5];
+const COF_SUS = [0,7,2,9,4,11,6,1,8,3,10,5];
+
+// Stored layout for click hit-testing
+let _mL=90, _mCW=58, _mHH=56, _mCH=28;
+
+function drawMappa(){
+  if(mappaParallel){ drawMappaParallel(); return; }
+  const canvas = document.getElementById('mappa-canvas');
+  const bassOrder = mappaBassCOF ? BASS_COF_ORDER : BASS_CHROM;
+  const container = canvas.parentElement;
+  const totalW = Math.max(container.clientWidth - 4, 700);
+  
+  const LABEL_W = 90, CELL_W = Math.max(Math.floor((totalW - LABEL_W) / 12), 58);
+  const HEADER_H = 56, CELL_H = 30;
+  _mL=LABEL_W; _mCW=CELL_W; _mHH=HEADER_H; _mCH=CELL_H; // store for click handler
+  const W = LABEL_W + 12*CELL_W;
+  const H = HEADER_H + 12*CELL_H;
+  
+  canvas.width = W; canvas.height = H;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  
+  const ctx2 = canvas.getContext('2d');
+  ctx2.clearRect(0,0,W,H);
+  
+  const COLORS = {
+    stabile:   {bg:'#d8f0e5', text:'#0a5e3a'},
+    dominante: {bg:'#fde8e5', text:'#a81800'},
+    esteso:    {bg:'#e5e0ff', text:'#2d0e99'},
+    politonale:{bg:'#fdf3cc', text:'#7a5500'},
+  };
+  
+  // Background
+  ctx2.fillStyle = '#f8f7f4';
+  ctx2.fillRect(0,0,W,H);
+  
+  // Header: sus families (columns)
+  const susOrder = mappaSusCOF ? COF_SUS : BASS_CHROM;
+  susOrder.forEach((fi,col)=>{
+    const x = LABEL_W + col*CELL_W;
+    ctx2.fillStyle = col%2===0?'#fff':'#f5f4f0';
+    ctx2.fillRect(x, 0, CELL_W, HEADER_H);
+    ctx2.fillStyle = '#1144aa';
+    ctx2.font = 'bold 9px IBM Plex Mono, monospace';
+    ctx2.textAlign = 'center';
+    ctx2.fillText(FAM[fi].r2+'sus2', x+CELL_W/2, HEADER_H/2-5);
+    ctx2.fillStyle = '#994400';
+    ctx2.font = '8px IBM Plex Mono, monospace';
+    ctx2.fillText(FAM[fi].r4+'sus4', x+CELL_W/2, HEADER_H/2+9);
+  });
+  
+  // Row labels + cells
+  bassOrder.forEach((bassIdx, row)=>{
+    const y = HEADER_H + row*CELL_H;
+    // Row label
+    ctx2.fillStyle = row%2===0?'#fff':'#f0ede8';
+    ctx2.fillRect(0, y, LABEL_W, CELL_H);
+    ctx2.fillStyle = '#333';
+    ctx2.font = 'bold 10px IBM Plex Mono, monospace';
+    ctx2.textAlign = 'center';
+    ctx2.fillText(NOTE[bassIdx], LABEL_W/2, y+CELL_H/2+4);
+    
+    susOrder.forEach((fi,col)=>{
+      const x = LABEL_W + col*CELL_W;
+      const interval = intOf(bassIdx, fi);
+      const q = quality(interval);
+      const col2 = COLORS[q];
+      
+      // Cell bg
+      ctx2.fillStyle = col2.bg;
+      ctx2.fillRect(x+1, y+1, CELL_W-2, CELL_H-2);
+      
+      // Chord name
+      const name = chordName(bassIdx, fi);
+      ctx2.fillStyle = col2.text;
+      ctx2.font = 'bold 7.5px IBM Plex Mono, monospace';
+      ctx2.textAlign = 'center';
+      
+      // Truncate if needed
+      let displayName = name;
+      if(ctx2.measureText(name).width > CELL_W-6){
+        displayName = name.replace('/'+NOTE[bassIdx],'').replace(NOTE[bassIdx],'');
+        ctx2.font = '6.5px IBM Plex Mono, monospace';
+      }
+      ctx2.fillText(displayName, x+CELL_W/2, y+CELL_H/2+3);
+    });
+    
+    // Grid lines
+    ctx2.strokeStyle = '#ddd';
+    ctx2.lineWidth = 0.5;
+    ctx2.beginPath();
+    ctx2.moveTo(0, y); ctx2.lineTo(W, y);
+    ctx2.stroke();
+  });
+  
+  // Column dividers
+  for(let col=0; col<=12; col++){
+    ctx2.strokeStyle = '#ddd'; ctx2.lineWidth = 0.5;
+    ctx2.beginPath();
+    ctx2.moveTo(LABEL_W+col*CELL_W, 0);
+    ctx2.lineTo(LABEL_W+col*CELL_W, H);
+    ctx2.stroke();
+  }
+  
+  // Header bottom border
+  ctx2.strokeStyle = '#aaa'; ctx2.lineWidth = 1;
+  ctx2.beginPath(); ctx2.moveTo(0,HEADER_H); ctx2.lineTo(W,HEADER_H); ctx2.stroke();
+  // Label right border
+  ctx2.beginPath(); ctx2.moveTo(LABEL_W,0); ctx2.lineTo(LABEL_W,H); ctx2.stroke();
+}
+
+function drawMappaParallel(){
+  // Rows = sus family (Csus, C#sus, ...) in COF or chromatic order
+  // Cols = relative bass interval from sus root (0=unisono, 1=b9, 2=M2, ... 11=M7)
+  // Each row starts at its own root → col 0 is always Xsus2 (or Xsus4 in 1-4-5 mode)
+  // Same chord TYPE appears in the same column across all rows
+  const canvas = document.getElementById('mappa-canvas');
+  const container = canvas.parentElement;
+  const totalW = Math.max(container.clientWidth - 4, 700);
+
+  const susOrder = mappaSusCOF ? COF_SUS : BASS_CHROM; // row order = sus families
+
+  // Col headers: relative interval from sus root
+  const REL_INTERVALS = mappaBassCOF ? [0,7,2,9,4,11,6,1,8,3,10,5] : [0,1,2,3,4,5,6,7,8,9,10,11];
+  const REL_NAMES = {0:'R',1:'+m2',2:'+M2',3:'+m3',4:'+M3',5:'+P4',6:'+TT',7:'+P5',8:'+m6',9:'+M6',10:'+m7',11:'+M7'};
+
+  const LABEL_W = 68, CELL_W = Math.max(Math.floor((totalW - LABEL_W) / 12), 58);
+  const HEADER_H = 52, CELL_H = 30;
+  _mL=LABEL_W; _mCW=CELL_W; _mHH=HEADER_H; _mCH=CELL_H;
+  const W = LABEL_W + 12*CELL_W;
+  const H = HEADER_H + 12*CELL_H;
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f8f7f4'; ctx.fillRect(0,0,W,H);
+
+  const COLORS={stabile:{bg:'#d8f0e5',text:'#0a5e3a'},dominante:{bg:'#fde8e5',text:'#a81800'},esteso:{bg:'#e5e0ff',text:'#2d0e99'},politonale:{bg:'#fdf3cc',text:'#7a5500'}};
+
+  // Col headers = relative interval
+  REL_INTERVALS.forEach((rel,col)=>{
+    const x=LABEL_W+col*CELL_W;
+    const q=quality((12-rel)%12); // quality of intOf = (-rel+12)%12
+    const cs=COLORS[q];
+    ctx.fillStyle=cs.bg; ctx.fillRect(x,0,CELL_W,HEADER_H);
+    ctx.fillStyle=cs.text; ctx.font='bold 7px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(REL_NAMES[rel]||'+'+rel,x+CELL_W/2,HEADER_H/2-3);
+    // Show interval number
+    ctx.fillStyle='#aaa'; ctx.font='6px IBM Plex Mono,monospace';
+    ctx.fillText('i='+(12-rel)%12,x+CELL_W/2,HEADER_H/2+9);
+  });
+
+  // Rows = sus families
+  susOrder.forEach((fi,row)=>{
+    const y=HEADER_H+row*CELL_H;
+    const susRoot=NOTE.indexOf(FAM[fi].r2);
+
+    // Row label: sus family name
+    ctx.fillStyle=row%2===0?'#fff':'#f0ede8'; ctx.fillRect(0,y,LABEL_W,CELL_H);
+    ctx.fillStyle='#1144aa'; ctx.font='bold 9px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(FAM[fi].r2+'sus',LABEL_W/2,y+CELL_H/2+3);
+
+    REL_INTERVALS.forEach((rel,col)=>{
+      const x=LABEL_W+col*CELL_W;
+      // bass = susRoot + rel (mod 12)
+      const bass=(susRoot+rel)%12;
+      const interval=intOf(bass,fi); // = (susRoot - bass + 12) % 12 = (-rel+12)%12
+      const q=quality(interval);
+      const cs=COLORS[q];
+
+      const isCurrent=(bass===curBass&&fi===curFam);
+      ctx.fillStyle=isCurrent?'#111':cs.bg; ctx.fillRect(x+1,y+1,CELL_W-2,CELL_H-2);
+
+      const name=chordName(bass,fi);
+      ctx.fillStyle=isCurrent?'#fff':cs.text;
+      ctx.font='bold 7.5px IBM Plex Mono,monospace'; ctx.textAlign='center';
+      let disp=name;
+      if(ctx.measureText(disp).width>CELL_W-6){
+        disp=disp.replace('/'+NOTE[bass],'');
+        ctx.font='6.5px IBM Plex Mono,monospace';
+      }
+      ctx.fillText(disp,x+CELL_W/2,y+CELL_H/2+3);
+    });
+
+    ctx.strokeStyle='#ddd'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  });
+
+  for(let col=0;col<=12;col++){
+    ctx.strokeStyle='#ddd'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(LABEL_W+col*CELL_W,0); ctx.lineTo(LABEL_W+col*CELL_W,H); ctx.stroke();
+  }
+  ctx.strokeStyle='#aaa'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,HEADER_H); ctx.lineTo(W,HEADER_H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(LABEL_W,0); ctx.lineTo(LABEL_W,H); ctx.stroke();
+
+  // Store col data for click handler
+  canvas._parallelRelIntervals = REL_INTERVALS;
+  canvas._parallelSusOrder = susOrder;
+}
+
+function initMappa(){
+  const canvas = document.getElementById('mappa-canvas');
+  
+  document.getElementById('mappa-chrom').addEventListener('click',()=>{
+    mappaBassCOF=false;
+    document.getElementById('mappa-chrom').classList.add('active');
+    document.getElementById('mappa-cof').classList.remove('active');
+    drawMappa();
+  });
+  document.getElementById('mappa-cof').addEventListener('click',()=>{
+    mappaBassCOF=true;
+    document.getElementById('mappa-cof').classList.add('active');
+    document.getElementById('mappa-chrom').classList.remove('active');
+    drawMappa();
+  });
+  document.getElementById('mappa-sus-chrom').addEventListener('click',()=>{
+    mappaSusCOF=false;
+    document.getElementById('mappa-sus-chrom').classList.add('active');
+    document.getElementById('mappa-sus-cof').classList.remove('active');
+    drawMappa();
+  });
+  document.getElementById('mappa-sus-cof').addEventListener('click',()=>{
+    mappaSusCOF=true;
+    document.getElementById('mappa-sus-cof').classList.add('active');
+    document.getElementById('mappa-sus-chrom').classList.remove('active');
+    drawMappa();
+  });
+  
+  // Mode buttons
+  ['off','sus','vl'].forEach(mode=>{
+    document.getElementById('mappa-mode-'+mode).addEventListener('click',()=>{
+      mappaPlayMode = mode;
+      ['off','sus','vl'].forEach(m=>{
+        const btn = document.getElementById('mappa-mode-'+m);
+        btn.classList.toggle('active', m===mode);
+      });
+      // show/hide reset VL button
+      const rvl = document.getElementById('mappa-reset-vl');
+      rvl.style.opacity = mode==='vl' ? '1' : '0.4';
+      rvl.style.pointerEvents = mode==='vl' ? 'auto' : 'none';
+      if(mode !== 'vl') resetVL();
+    });
+  });
+  document.getElementById('mappa-reset-vl').addEventListener('click',()=>{
+    resetVL();
+    const btn=document.getElementById('mappa-reset-vl');
+    btn.textContent='✓ reset'; setTimeout(()=>btn.textContent='↺ reset VL',600);
+  });
+  
+  canvas.addEventListener('click', e=>{
+    const rect = canvas.getBoundingClientRect();
+    if(mappaParallel){
+      const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+      const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+      const col=Math.floor((mx-_mL)/_mCW),row=Math.floor((my-_mHH)/_mCH);
+      if(col<0||col>11||row<0||row>11) return;
+      const REL_INTERVALS=mappaBassCOF?[0,7,2,9,4,11,6,1,8,3,10,5]:[0,1,2,3,4,5,6,7,8,9,10,11];
+      const susOrder=mappaSusCOF?COF_SUS:BASS_CHROM;
+      const fi=susOrder[row];
+      const susRoot=NOTE.indexOf(FAM[fi].r2);
+      const rel=REL_INTERVALS[col];
+      const bass=(susRoot+rel)%12;
+      curBass=bass; curFam=fi;
+      selBass.value=bass; selSus.value=fi;
+      if(mappaPlayMode!=='off'){
+        const sn=getSusNotes(fi);
+        if(mappaPlayMode==='sus'){ resetVL(); playVoicing(buildVoicing(bass,sn,null,'above',curBassOct,curFifths),false); }
+        else if(mappaPlayMode==='vl') playVoicing(buildVLVoicing(bass,sn,curBassOct,curFifths),false);
+      }
+      setTimeout(()=>{render();drawMappa();},200);
+      return;
+    }
+    // canvas coords: account for CSS scaling
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top)  * scaleY;
+    const bassOrder = mappaBassCOF ? BASS_COF_ORDER : BASS_CHROM;
+    // use stored layout constants
+    const col = Math.floor((mx - _mL) / _mCW);
+    const row = Math.floor((my - _mHH) / _mCH);
+    if(col<0||col>11||row<0||row>11) return;
+    const bassIdx = bassOrder[row];
+    const fi = (mappaSusCOF ? COF_SUS : BASS_CHROM)[col];
+    const sn = getSusNotes(fi);
+    // Highlight cell
+    const ctx2 = canvas.getContext('2d');
+    const cx2 = _mL + col*_mCW, cy2 = _mHH + row*_mCH;
+    ctx2.strokeStyle='#111'; ctx2.lineWidth=2;
+    ctx2.strokeRect(cx2+2, cy2+2, _mCW-4, _mCH-4);
+    // Play according to mode
+    if(mappaPlayMode === 'sus'){
+      resetVL();
+      const v = buildVoicing(bassIdx, sn, null, 'above', curBassOct, curFifths);
+      playVoicing(v, false);
+    } else if(mappaPlayMode === 'vl'){
+      const v = buildVLVoicing(bassIdx, sn, curBassOct, curFifths);
+      playVoicing(v, false);
+    }
+    // Also update main selectors to this chord
+    selBass.value = bassIdx;
+    selSus.value = fi;
+    curBass=bassIdx; curFam=fi;
+    setTimeout(()=>{ render(); drawMappa(); }, 200);
+  });
+  
+  document.getElementById('mappa-view-normal').addEventListener('click',()=>{
+    mappaParallel=false;
+    document.getElementById('mappa-view-normal').classList.add('active');
+    document.getElementById('mappa-view-parallel').classList.remove('active');
+    drawMappa();
+  });
+  document.getElementById('mappa-view-parallel').addEventListener('click',()=>{
+    mappaParallel=true;
+    document.getElementById('mappa-view-parallel').classList.add('active');
+    document.getElementById('mappa-view-normal').classList.remove('active');
+    drawMappa();
+  });
+  drawMappa();
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// CERCHIO SUS — INTERACTIVE CIRCLE
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  // FAM data already defined globally above — reuse it
+  const COF = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5];
+
+  function getMovement(fromFi, toFi) {
+    const a = getSusNotes(fromFi);
+    const b = getSusNotes(toFi);
+    const fromNote = a.find(n => !b.includes(n));
+    const toNote   = b.find(n => !a.includes(n));
+    const diff = ((toNote - fromNote + 12) % 12);
+    const semUp = diff <= 6 ? diff : diff - 12;
+    return {fromNote, toNote, semUp};
+  }
+
+  const W=580, H=580, CX=W/2, CY=H/2, R=220, NR=44;
+
+  const POS = COF.map((famIdx, pos) => {
+    const angle = (pos/12)*2*Math.PI - Math.PI/2;
+    return { x:CX+R*Math.cos(angle), y:CY+R*Math.sin(angle), famIdx, pos, angle };
+  });
+
+  const EDGES = Array.from({length:12},(_,i)=>{
+    const j=(i+1)%12;
+    return { i, j,
+      cwMv:  getMovement(POS[i].famIdx, POS[j].famIdx),
+      ccwMv: getMovement(POS[j].famIdx, POS[i].famIdx),
+    };
+  });
+
+  const svg = document.getElementById('circle-svg');
+  function svgEl(tag,attrs,text){
+    const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v);
+    if(text!==undefined) e.textContent=text;
+    return e;
+  }
+
+  // Guide circle
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R,fill:'none',stroke:'#ddd','stroke-width':'1','stroke-dasharray':'3,6'}));
+
+  // Center
+  svg.appendChild(svgEl('text',{x:CX,y:CY-7,'text-anchor':'middle','dominant-baseline':'middle','font-size':'10',fill:'#aaa','font-family':'IBM Plex Mono,monospace'},'12 famiglie sus'));
+  svg.appendChild(svgEl('text',{x:CX,y:CY+8,'text-anchor':'middle','dominant-baseline':'middle','font-size':'8',fill:'#bbb','font-family':'IBM Plex Mono,monospace'},'Xsus2 = (X+P5)sus4'));
+
+  // Edges
+  const edgeLines=[], edgeLbls=[];
+  EDGES.forEach((edge,idx)=>{
+    const p1=POS[edge.i],p2=POS[edge.j];
+    const dx=p2.x-p1.x,dy=p2.y-p1.y,dist=Math.sqrt(dx*dx+dy*dy);
+    const nx=dx/dist,ny=dy/dist;
+    const x1=p1.x+nx*(NR+2),y1=p1.y+ny*(NR+2);
+    const x2=p2.x-nx*(NR+2),y2=p2.y-ny*(NR+2);
+    const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
+    const tcx=CX-mx,tcy=CY-my,tcL=Math.sqrt(tcx*tcx+tcy*tcy);
+    const lx=mx+(tcx/tcL)*26,ly=my+(tcy/tcL)*26;
+    const line=svgEl('line',{'data-edge':idx,x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#ccc','stroke-width':'1.5','stroke-linecap':'round'});
+    svg.appendChild(line); edgeLines.push(line);
+    const n1=NOTE[edge.cwMv.fromNote],n2=NOTE[edge.cwMv.toNote];
+    const lbl=svgEl('text',{'data-edge':idx,x:lx.toFixed(1),y:ly.toFixed(1),'font-size':'7.5',fill:'#bbb','text-anchor':'middle','dominant-baseline':'middle','font-family':'IBM Plex Mono,monospace','pointer-events':'none'},n1+'↔'+n2);
+    svg.appendChild(lbl); edgeLbls.push(lbl);
+  });
+
+  // Nodes
+  const nodeGroups=[];
+  POS.forEach((p,pos)=>{
+    const fam=FAM[p.famIdx];
+    const notesStr=getSusNotes(p.famIdx).map(n=>NOTE[n]).join(' ');
+    const g=svgEl('g',{'class':'circ-node','data-pos':pos,transform:`translate(${p.x.toFixed(1)},${p.y.toFixed(1)})`});
+    const bg=svgEl('circle',{'class':'circ-bg',r:NR,fill:'#fff',stroke:'#ddd','stroke-width':'1.5'});
+    g.appendChild(bg);
+    g.appendChild(svgEl('text',{y:'-13','text-anchor':'middle','dominant-baseline':'middle','font-size':'10','font-weight':'700',fill:'#1144aa','font-family':'IBM Plex Mono,monospace','pointer-events':'none'},fam.r2+'sus2'));
+    g.appendChild(svgEl('text',{y:'1','text-anchor':'middle','dominant-baseline':'middle','font-size':'8',fill:'#ccc','pointer-events':'none'},'= ='));
+    g.appendChild(svgEl('text',{y:'14','text-anchor':'middle','dominant-baseline':'middle','font-size':'9',fill:'#994400','font-family':'IBM Plex Mono,monospace','pointer-events':'none'},fam.r4+'sus4'));
+    g.appendChild(svgEl('text',{y:'27','text-anchor':'middle','dominant-baseline':'middle','font-size':'7.5',fill:'#ccc','font-family':'IBM Plex Mono,monospace','pointer-events':'none'},notesStr));
+    g.addEventListener('click',()=>selectCircleNode(pos));
+    // play on click — also trigger audio
+    g.addEventListener('click',()=>{
+      const susN=getSusNotes(p.famIdx);
+      playVoicing(buildVoicing(susN[0],susN,null,true,curBassOct,curFifths),false);
+    });
+    svg.appendChild(g); nodeGroups.push(g);
+  });
+
+  let circSelected=null;
+
+  function resetCircle(){
+    nodeGroups.forEach(g=>{
+      g.querySelector('.circ-bg').setAttribute('fill','#fff');
+      g.querySelector('.circ-bg').setAttribute('stroke','#ddd');
+      g.querySelector('.circ-bg').setAttribute('stroke-width','1.5');
+    });
+    edgeLines.forEach(l=>{l.setAttribute('stroke','#ccc');l.setAttribute('stroke-width','1.5');});
+    edgeLbls.forEach(l=>l.setAttribute('fill','#bbb'));
+  }
+
+  function selectCircleNode(pos){
+    circSelected=pos;
+    resetCircle();
+    const fam=FAM[POS[pos].famIdx];
+    const notesStr=getSusNotes(POS[pos].famIdx).map(n=>NOTE[n]).join(', ');
+
+    // selected node
+    const sb=nodeGroups[pos].querySelector('.circ-bg');
+    sb.setAttribute('fill','#dde8ff'); sb.setAttribute('stroke','#1144aa'); sb.setAttribute('stroke-width','2.5');
+
+    // edges + neighbors
+    const cwEi=pos, ccwEi=(pos+11)%12;
+    [cwEi,ccwEi].forEach(ei=>{
+      edgeLines[ei].setAttribute('stroke','#1144aa'); edgeLines[ei].setAttribute('stroke-width','2');
+      edgeLbls[ei].setAttribute('fill','#1144aa');
+    });
+    const cwPos=(pos+1)%12, ccwPos=(pos+11)%12;
+    [cwPos,ccwPos].forEach(ap=>{
+      nodeGroups[ap].querySelector('.circ-bg').setAttribute('fill','#f5f8ff');
+      nodeGroups[ap].querySelector('.circ-bg').setAttribute('stroke','#557799');
+      nodeGroups[ap].querySelector('.circ-bg').setAttribute('stroke-width','2');
+    });
+
+    const cwMv=EDGES[cwEi].cwMv, cwFam=FAM[POS[cwPos].famIdx];
+    const ccwMv=EDGES[ccwEi].ccwMv, ccwFam=FAM[POS[ccwPos].famIdx];
+
+    function mvHtml(mv, targetFam){
+      const dir=mv.semUp>0?`+${mv.semUp}st ↑m3`:`${mv.semUp}st ↓m3`;
+      return `<div class="circ-move-row">
+        <span class="circ-chord-badge">${targetFam.r2}sus2 = ${targetFam.r4}sus4</span>
+        <span style="color:var(--muted)">muovi</span>
+        <span class="circ-note-from">${NOTE[mv.fromNote]}</span>
+        <span>→</span>
+        <span class="circ-note-to">${NOTE[mv.toNote]}</span>
+        <span style="color:var(--faint);font-size:9px">(${dir})</span>
+      </div>`;
+    }
+
+    document.getElementById('circle-info').innerHTML=`
+      <div class="circ-info-title">
+        <span style="color:#1144aa;font-weight:700">${fam.r2}sus2</span>
+        <span style="color:var(--muted)">=</span>
+        <span style="color:#994400;font-weight:700">${fam.r4}sus4</span>
+        <span class="circ-notes-badge">{ ${notesStr} }</span>
+      </div>
+      <div style="font-size:9px;color:var(--muted);margin-bottom:10px">ogni passo sposta una nota di m3 (3 semitoni)</div>
+      <div style="font-size:9px;color:#555;margin-bottom:4px">↻ clockwise</div>
+      ${mvHtml(cwMv,cwFam)}
+      <div style="font-size:9px;color:#555;margin:8px 0 4px">↺ counter-clockwise</div>
+      ${mvHtml(ccwMv,ccwFam)}
+      <div class="circ-legend">↻ nota scende m3 · root sale P4 &nbsp;|&nbsp; ↺ nota sale m3 · root scende P4</div>`;
+  }
+
+  selectCircleNode(0);
+})();
+
+
+// ═══════════════════════════════════════════════════════════════
+// SCALES DATA
+// ═══════════════════════════════════════════════════════════════
+const SCALES = {
+  'Major (Ionian)':    [0,2,4,5,7,9,11],
+  'Dorian':            [0,2,3,5,7,9,10],
+  'Phrygian':          [0,1,3,5,7,8,10],
+  'Lydian':            [0,2,4,6,7,9,11],
+  'Mixolydian':        [0,2,4,5,7,9,10],
+  'Aeolian (minor)':   [0,2,3,5,7,8,10],
+  'Locrian':           [0,1,3,5,6,8,10],
+  'Melodic Minor':     [0,2,3,5,7,9,11],
+  'Harmonic Minor':    [0,2,3,5,7,8,11],
+  'Lydian Dominant':   [0,2,4,6,7,9,10],
+  'Altered':           [0,1,3,4,6,8,10],
+  'Whole Tone':        [0,2,4,6,8,10],
+  'Diminished (HW)':   [0,1,3,4,6,7,9,10],
+  'Pentatonic Major':  [0,2,4,7,9],
+  'Pentatonic Minor':  [0,3,5,7,10],
+};
+
+const COF_ORDER = [0,7,2,9,4,11,6,1,8,3,10,5];
+
+function cofPos(fi){ return COF_ORDER.indexOf(fi); }
+
+function getMovement(fromFi, toFi){
+  const a=getSusNotes(fromFi), b=getSusNotes(toFi);
+  const fromNote=a.find(n=>!b.includes(n));
+  const toNote=b.find(n=>!a.includes(n));
+  if(fromNote===undefined) return null;
+  const diff=((toNote-fromNote+12)%12);
+  return{fromNote, toNote, semUp: diff<=6?diff:diff-12};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: DECOMPOSIZIONE
+// ═══════════════════════════════════════════════════════════════
+function parseNoteInput(str){
+  const map={'C':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'F':5,'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11};
+  return str.trim().split(/[\s,;]+/).map(s=>{
+    if(!s) return null;
+    // Normalize: capitalize first letter, lowercase rest
+    const norm = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase().replace('b','b').replace('#','#');
+    if(map[norm]!==undefined) return map[norm];
+    // Try just first char
+    const just1 = s.charAt(0).toUpperCase();
+    return map[just1]!==undefined ? map[just1] : null;
+  }).filter(n=>n!==null&&n!==undefined);
+}
+
+function renderDecomp(noteSet){
+  const grid=document.getElementById('decomp-grid');
+  const insight=document.getElementById('decomp-insight');
+  const label=document.getElementById('decomp-label');
+  grid.innerHTML=''; insight.style.display='none';
+  if(!noteSet||noteSet.length<3){
+    label.textContent='▸ Inserisci almeno 3 note';
+    return;
+  }
+  const unique=[...new Set(noteSet)];
+  label.textContent=`▸ Coppie sus che coprono {${unique.map(n=>NOTE[n]).join(' ')}}`;
+
+  const results=[];
+  for(let a=0;a<12;a++) for(let b=a+1;b<12;b++){
+    const an=getSusNotes(a), bn=getSusNotes(b);
+    const union=[...new Set([...an,...bn])];
+    if(unique.every(n=>union.includes(n))){
+      const shared=an.filter(n=>bn.includes(n));
+      const onlyA=an.filter(n=>!bn.includes(n));
+      const onlyB=bn.filter(n=>!an.includes(n));
+      const uncovered=union.filter(n=>!unique.includes(n));
+      const steps=Math.abs(cofPos(a)-cofPos(b));
+      const cofDist=Math.min(steps,12-steps);
+      results.push({a,b,shared,onlyA,onlyB,uncovered,cofDist});
+    }
+  }
+
+  results.sort((x,y)=>x.cofDist-y.cofDist||(x.uncovered.length-y.uncovered.length));
+
+  if(results.length===0){
+    grid.innerHTML='<div class="insight">Nessuna coppia sus copre esattamente questo insieme di note.</div>';
+    return;
+  }
+
+  results.forEach(r=>{
+    const d=document.createElement('div');
+    d.className='card';
+    d.style.borderLeft='3px solid #555';
+    const susAN=getSusNotes(r.a), susBN=getSusNotes(r.b);
+    const sharedStr=r.shared.length?r.shared.map(n=>NOTE[n]).join(' '):'–';
+    const extraStr=r.uncovered.length?r.uncovered.map(n=>NOTE[n]).join(' '):'nessuna';
+    d.innerHTML=`
+      <div class="card-label">coppia sus</div>
+      <div class="card-chord" style="font-size:12px">${FAM[r.a].r2}sus + ${FAM[r.b].r2}sus</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin:4px 0">
+        {${susAN.map(n=>NOTE[n]).join(' ')}} + {${susBN.map(n=>NOTE[n]).join(' ')}}
+      </div>
+      <div style="font-family:var(--mono);font-size:8px;margin:3px 0">
+        <span style="color:#0a5e3a">●</span> shared: ${sharedStr}
+      </div>
+      <div style="font-family:var(--mono);font-size:8px;margin:3px 0;color:var(--muted)">
+        extra: ${extraStr}
+      </div>
+      <div class="card-footer" style="margin-top:8px">
+        <span class="ctag" style="background:#f0f0f0;color:#555">${r.cofDist} passi COF</span>
+        <div class="card-btns">
+          <button class="cpbtn">▶ A</button>
+          <button class="cpbtn">▶ B</button>
+          <button class="cpbtn">A→B</button>
+        </div>
+      </div>`;
+    d.querySelectorAll('.cpbtn')[0].addEventListener('click',e=>{
+      e.stopPropagation();
+      playVoicing(buildVoicing(susAN[0],susAN,null,'above',curBassOct,curFifths),false);
+    });
+    d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{
+      e.stopPropagation();
+      playVoicing(buildVoicing(susBN[0],susBN,null,'above',curBassOct,curFifths),false);
+    });
+    d.querySelectorAll('.cpbtn')[2].addEventListener('click',e=>{
+      e.stopPropagation();
+      resetVL();
+      const va=buildVLVoicing(susAN[0],susAN,curBassOct,curFifths);
+      playVoicing(va,false);
+      const vb=buildVLVoicing(susBN[0],susBN,curBassOct,curFifths);
+      setTimeout(()=>playVoicing(vb,false),900);
+    });
+    grid.appendChild(d);
+  });
+
+  insight.style.display='block';
+  insight.innerHTML=`<b>DECOMPOSIZIONE</b><br><br>
+    Trovate <b>${results.length}</b> coppie sus che coprono l'accordo.<br>
+    La più vicina sul cerchio: <b>${FAM[results[0].a].r2}sus + ${FAM[results[0].b].r2}sus</b> (${results[0].cofDist} passi).
+    ${results[0].shared.length?'Nota condivisa: <b>'+results[0].shared.map(n=>NOTE[n]).join(' ')+'</b>.':'Nessuna nota condivisa — due sus paralleli.'}`;
+}
+
+function initDecomp(){
+  document.getElementById('decomp-btn').addEventListener('click',()=>{
+    const notes=parseNoteInput(document.getElementById('decomp-input').value);
+    renderDecomp(notes);
+  });
+  document.getElementById('decomp-from-sel').addEventListener('click',()=>{
+    const notes=[curBass,...getSusNotes(curFam)].filter((v,i,a)=>a.indexOf(v)===i);
+    document.getElementById('decomp-input').value=notes.map(n=>NOTE[n]).join(' ');
+    renderDecomp(notes);
+  });
+  document.getElementById('decomp-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter') document.getElementById('decomp-btn').click();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: DISTANZA (common-tone matrix)
+// ═══════════════════════════════════════════════════════════════
+let distMode = 'sus'; // 'sus' | 'chord'
+
+function drawDistanza(){
+  const canvas = document.getElementById('dist-canvas');
+  if(distMode === 'sus') drawDistSus(canvas);
+  else drawDistChord(canvas);
+}
+
+function drawDistSus(canvas){
+  const S=46, LABEL=56;
+  const W=LABEL+12*S, H=LABEL+12*S;
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f8f7f4'; ctx.fillRect(0,0,W,H);
+  const BG=['#fff','#f0efe9','#d8f0e5','#0a5e3a'];
+  const TC=['#ccc','#888','#0a5e3a','#fff'];
+
+  COF_ORDER.forEach((fi,i)=>{
+    ctx.fillStyle='#f5f4f0';
+    ctx.fillRect(LABEL+i*S,0,S,LABEL); ctx.fillRect(0,LABEL+i*S,LABEL,S);
+    ctx.fillStyle='#1144aa'; ctx.font='bold 7.5px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(FAM[fi].r2+'sus',LABEL+i*S+S/2,LABEL/2-3);
+    ctx.fillText(FAM[fi].r2+'sus',LABEL/2,LABEL+i*S+S/2+4);
+  });
+
+  COF_ORDER.forEach((fi,row)=>{
+    COF_ORDER.forEach((fj,col)=>{
+      const an=getSusNotes(fi), bn=getSusNotes(fj);
+      const sharedNotes=an.filter(n=>bn.includes(n));
+      const shared=sharedNotes.length;
+      const x=LABEL+col*S, y=LABEL+row*S;
+      ctx.fillStyle=BG[shared]; ctx.fillRect(x+1,y+1,S-2,S-2);
+      ctx.fillStyle=TC[shared]; ctx.font='bold 13px IBM Plex Mono,monospace'; ctx.textAlign='center';
+      ctx.fillText(shared,x+S/2,y+S/2+2);
+      if(shared>0&&shared<3){
+        ctx.font='6px IBM Plex Mono,monospace';
+        ctx.fillText(sharedNotes.map(n=>NOTE[n]).join(''),x+S/2,y+S/2+13);
+      }
+    });
+  });
+
+  _drawDistGrid(ctx,W,H,LABEL,S);
+  ctx.fillStyle='#999'; ctx.font='7.5px IBM Plex Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('0=nessuna  1=1 nota  2=2 note  3=stessa famiglia. Click per sentire.',LABEL,H-3);
+}
+
+function drawDistChord(canvas){
+  // Rows = bass (chromatic), cols = sus (COF), cell = notes shared with curBass+curFam
+  const refNotes = [curBass, ...getSusNotes(curFam)].filter((v,i,a)=>a.indexOf(v)===i);
+  const refName = chordName(curBass, curFam);
+
+  const S=46, LABEL_W=38, LABEL_H=56;
+  const W=LABEL_W+12*S, H=LABEL_H+12*S;
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f8f7f4'; ctx.fillRect(0,0,W,H);
+
+  const maxShared=refNotes.length; // max possible = 4 (bass+3)
+  function sharedColor(n, max){
+    if(n===0) return {bg:'#fff',tc:'#ccc'};
+    if(n===max) return {bg:'#0a5e3a',tc:'#fff'};
+    const frac=n/max;
+    if(frac<=0.33) return {bg:'#f0efe9',tc:'#888'};
+    if(frac<=0.66) return {bg:'#d8f0e5',tc:'#0a5e3a'};
+    return {bg:'#a0d4ba',tc:'#0a5e3a'};
+  }
+
+  // Col headers = sus families (COF order)
+  COF_ORDER.forEach((fi,col)=>{
+    ctx.fillStyle='#f5f4f0'; ctx.fillRect(LABEL_W+col*S,0,S,LABEL_H);
+    ctx.fillStyle='#1144aa'; ctx.font='bold 7px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(FAM[fi].r2+'sus',LABEL_W+col*S+S/2,LABEL_H/2-3);
+  });
+  // Row headers = bass notes (chromatic)
+  for(let b=0;b<12;b++){
+    ctx.fillStyle='#f5f4f0'; ctx.fillRect(0,LABEL_H+b*S,LABEL_W,S);
+    ctx.fillStyle='#333'; ctx.font='bold 9px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(NOTE[b],LABEL_W/2,LABEL_H+b*S+S/2+4);
+  }
+
+  // Cells
+  for(let b=0;b<12;b++){
+    COF_ORDER.forEach((fi,col)=>{
+      const chordNotes=[b,...getSusNotes(fi)].filter((v,i,a)=>a.indexOf(v)===i);
+      const sharedNotes=refNotes.filter(n=>chordNotes.includes(n));
+      const shared=sharedNotes.length;
+      const {bg,tc}=sharedColor(shared,maxShared);
+      const x=LABEL_W+col*S, y=LABEL_H+b*S;
+      // Highlight current selection
+      const isCurrent=(b===curBass&&fi===curFam);
+      ctx.fillStyle=isCurrent?'#111':bg; ctx.fillRect(x+1,y+1,S-2,S-2);
+      ctx.fillStyle=isCurrent?'#fff':tc; ctx.font='bold 12px IBM Plex Mono,monospace'; ctx.textAlign='center';
+      ctx.fillText(shared,x+S/2,y+S/2+2);
+      if(shared>0&&shared<maxShared&&sharedNotes.length<=2){
+        ctx.font='5.5px IBM Plex Mono,monospace';
+        ctx.fillText(sharedNotes.map(n=>NOTE[n]).join(''),x+S/2,y+S/2+12);
+      }
+    });
+  }
+
+  _drawDistGrid(ctx,W,H,LABEL_H,S,LABEL_W);
+  ctx.fillStyle='#999'; ctx.font='7.5px IBM Plex Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('Note in comune con: '+refName+' {'+refNotes.map(n=>NOTE[n]).join(' ')+'}  Click per sentire.',LABEL_W,H-3);
+}
+
+function _drawDistGrid(ctx,W,H,LABEL,S,LABEL_W){
+  const LW=LABEL_W||LABEL;
+  ctx.strokeStyle='#ddd'; ctx.lineWidth=0.5;
+  for(let i=0;i<=12;i++){
+    ctx.beginPath(); ctx.moveTo(LW+i*S,0); ctx.lineTo(LW+i*S,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,LABEL+i*S); ctx.lineTo(W,LABEL+i*S); ctx.stroke();
+  }
+  ctx.strokeStyle='#aaa'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(LW,0); ctx.lineTo(LW,H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,LABEL); ctx.lineTo(W,LABEL); ctx.stroke();
+}
+
+function initDistanza(){
+  // Mode toggle buttons
+  document.getElementById('dist-mode-sus').addEventListener('click',()=>{
+    distMode='sus';
+    document.getElementById('dist-mode-sus').classList.add('active');
+    document.getElementById('dist-mode-chord').classList.remove('active');
+    document.getElementById('dist-desc').textContent='Note in comune tra coppie di famiglie sus. Click per sentire.';
+    drawDistanza();
+  });
+  document.getElementById('dist-mode-chord').addEventListener('click',()=>{
+    distMode='chord';
+    document.getElementById('dist-mode-chord').classList.add('active');
+    document.getElementById('dist-mode-sus').classList.remove('active');
+    document.getElementById('dist-desc').textContent='Note in comune tra tutti gli accordi (basso+sus) e la selezione corrente. Click per sentire.';
+    drawDistanza();
+  });
+
+  const canvas=document.getElementById('dist-canvas');
+  canvas.addEventListener('click',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const S=46;
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    const mx=(e.clientX-rect.left)*sx, my=(e.clientY-rect.top)*sy;
+
+    if(distMode==='sus'){
+      const LABEL=56;
+      const col=Math.floor((mx-LABEL)/S), row=Math.floor((my-LABEL)/S);
+      if(col<0||col>11||row<0||row>11) return;
+      const fi=COF_ORDER[row], fj=COF_ORDER[col];
+      resetVL();
+      const sni=getSusNotes(fi), snj=getSusNotes(fj);
+      playVoicing(buildVoicing(sni[0],sni,null,'above',curBassOct,curFifths),false);
+      setTimeout(()=>playVoicing(buildVoicing(snj[0],snj,null,'above',curBassOct,curFifths),false),800);
+      const ctx=canvas.getContext('2d');
+      ctx.strokeStyle='#111'; ctx.lineWidth=2;
+      ctx.strokeRect(LABEL+col*S+2,LABEL+row*S+2,S-4,S-4);
+      setTimeout(()=>drawDistanza(),500);
+    } else {
+      const LABEL_W=38, LABEL_H=56;
+      const col=Math.floor((mx-LABEL_W)/S), row=Math.floor((my-LABEL_H)/S);
+      if(col<0||col>11||row<0||row>11) return;
+      const bassIdx=row, fi=COF_ORDER[col];
+      const sn=getSusNotes(fi);
+      // Update main selection
+      selBass.value=bassIdx; selSus.value=fi;
+      curBass=bassIdx; curFam=fi;
+      resetVL();
+      playVoicing(buildVoicing(bassIdx,sn,null,'above',curBassOct,curFifths),false);
+      const ctx=canvas.getContext('2d');
+      ctx.strokeStyle='#111'; ctx.lineWidth=2;
+      ctx.strokeRect(LABEL_W+col*S+2,LABEL_H+row*S+2,S-4,S-4);
+      setTimeout(()=>{ render(); drawDistanza(); },300);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: SCALA
+// ═══════════════════════════════════════════════════════════════
+let scalaView = 'sus'; // 'sus' | 'chord'
+let scalaShowOutBass = false;
+let scalaBassCOF = false;
+let scalaSusCOF = true;
+
+function getScaleNotes(){
+  const root=parseInt(document.getElementById('scala-root').value);
+  const modeName=document.getElementById('scala-mode').value;
+  return SCALES[modeName].map(i=>(root+i)%12);
+}
+
+function renderScala(){
+  if(scalaView==='sus') renderScalaSus();
+  else renderScalaChord();
+}
+
+function renderScalaSus(){
+  const scaleNotes=getScaleNotes();
+  const root=parseInt(document.getElementById('scala-root').value);
+  const modeName=document.getElementById('scala-mode').value;
+
+  // Section labels
+  const inGrid=document.getElementById('scala-in-grid');
+  const outGrid=document.getElementById('scala-out-grid');
+  inGrid.innerHTML=''; outGrid.innerHTML='';
+
+  // Count in-scale families
+  const inFamilies=[], outFamilies=[];
+  for(let f=0;f<12;f++){
+    const fn=getSusNotes(f);
+    const inScale=fn.every(n=>scaleNotes.includes(n));
+    if(inScale) inFamilies.push(f); else outFamilies.push(f);
+  }
+
+  document.getElementById('scala-label').textContent=
+    `▸ Famiglie sus completamente in ${NOTE[root]} ${modeName}  (${inFamilies.length}/12)`;
+  document.getElementById('scala-out-label').textContent=
+    `▸ Fuori scala — note estranee in rosso  (${outFamilies.length}/12)`;
+
+  // Render IN-scale cards (only scale notes, clean)
+  inFamilies.forEach(f=>{
+    const fn=getSusNotes(f);
+    const d=document.createElement('div');
+    d.className='card';
+    d.style.borderLeft='3px solid var(--stabile)';
+    d.innerHTML=`
+      <div class="card-label">✓ dentro</div>
+      <div class="card-chord" style="color:var(--stabile)">${FAM[f].r2}sus2</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px">${FAM[f].r4}sus4</div>
+      <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:#222;margin-bottom:8px">${fn.map(n=>NOTE[n]).join(' · ')}</div>
+      <div class="card-btns">
+        <button class="cpbtn">▶</button><button class="cpbtn">⤵</button>
+      </div>`;
+    d.querySelectorAll('.cpbtn')[0].addEventListener('click',e=>{e.stopPropagation();playVoicing(buildVoicing(fn[0],fn,null,'above',curBassOct,curFifths),false);});
+    d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{e.stopPropagation();playVoicing(buildVoicing(fn[0],fn,null,'above',curBassOct,curFifths),true);});
+    inGrid.appendChild(d);
+  });
+
+  // Render OUT-of-scale cards (show which notes are alien)
+  outFamilies.forEach(f=>{
+    const fn=getSusNotes(f);
+    const outNotes=fn.filter(n=>!scaleNotes.includes(n));
+    const inNotes=fn.filter(n=>scaleNotes.includes(n));
+    // Show each note: in-scale normal, out-of-scale red
+    const noteLabels=fn.map(n=>{
+      const isOut=!scaleNotes.includes(n);
+      return isOut
+        ? `<span style="color:var(--dominante);font-weight:700">${NOTE[n]}</span>`
+        : `<span style="color:#555">${NOTE[n]}</span>`;
+    }).join(' <span style="color:#ccc">·</span> ');
+
+    const d=document.createElement('div');
+    d.className='card';
+    d.style.borderLeft='3px solid var(--faint)';
+    d.style.opacity='0.8';
+    d.innerHTML=`
+      <div class="card-label" style="color:var(--muted)">✗ fuori (${outNotes.length} nota${outNotes.length>1?'e':''})</div>
+      <div class="card-chord" style="color:var(--muted)">${FAM[f].r2}sus2</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--faint);margin-bottom:4px">${FAM[f].r4}sus4</div>
+      <div style="font-family:var(--mono);font-size:10px;margin-bottom:4px">${noteLabels}</div>
+      <div style="font-family:var(--mono);font-size:7.5px;color:var(--dominante);margin-bottom:8px">estranee: ${outNotes.map(n=>NOTE[n]).join(', ')}</div>
+      <div class="card-btns">
+        <button class="cpbtn">▶</button><button class="cpbtn">⤵</button>
+      </div>`;
+    d.querySelectorAll('.cpbtn')[0].addEventListener('click',e=>{e.stopPropagation();playVoicing(buildVoicing(fn[0],fn,null,'above',curBassOct,curFifths),false);});
+    d.querySelectorAll('.cpbtn')[1].addEventListener('click',e=>{e.stopPropagation();playVoicing(buildVoicing(fn[0],fn,null,'above',curBassOct,curFifths),true);});
+    outGrid.appendChild(d);
+  });
+}
+
+function renderScalaChord(){
+  const scaleNotes=getScaleNotes();
+  const canvas=document.getElementById('scala-canvas');
+
+  // Bass row order
+  const bassInScale=[], bassOutScale=[];
+  for(let b=0;b<12;b++){
+    if(scaleNotes.includes(b)) bassInScale.push(b);
+    else bassOutScale.push(b);
+  }
+  // Separated: in-scale rows first, divider, out-of-scale rows below
+  // Integrated: all 12 chromatic, no divider
+  const chromOrder=[0,1,2,3,4,5,6,7,8,9,10,11];
+  const cofOrder12=[0,7,2,9,4,11,6,1,8,3,10,5];
+  const baseOrder = scalaBassCOF ? cofOrder12 : chromOrder;
+  const bassInScaleOrdered = baseOrder.filter(b=>scaleNotes.includes(b));
+  const bassOutOrdered = baseOrder.filter(b=>!scaleNotes.includes(b));
+  const bassOrder = scalaShowOutBass
+    ? [...bassInScaleOrdered, null, ...bassOutOrdered]
+    : baseOrder;
+  const ROWS=bassOrder.length;
+
+  const S=44, LABEL_W=42, LABEL_H=56;
+  const W=LABEL_W+12*S, H=LABEL_H+ROWS*S;
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f8f7f4'; ctx.fillRect(0,0,W,H);
+
+  // Color: counts only non-null chord notes in scale
+  // BUT: bass not in scale → whole row gets muted style regardless
+  function cellColor(inCount, maxCount, bassInSc){
+    if(!bassInSc) return {bg:'#f5f3ef',tc:'#bbb'}; // bass out of scale → always dim
+    if(inCount===maxCount) return {bg:'#0a5e3a',tc:'#fff'};
+    if(inCount===maxCount-1) return {bg:'#d8f0e5',tc:'#0a5e3a'};
+    if(inCount===maxCount-2) return {bg:'#f0efe9',tc:'#888'};
+    return {bg:'#fde8e5',tc:'#a81800'};
+  }
+
+  // Col headers (sus order)
+  const scalaColOrder = scalaSusCOF ? COF_ORDER : [0,1,2,3,4,5,6,7,8,9,10,11];
+  scalaColOrder.forEach((fi,col)=>{
+    ctx.fillStyle='#f5f4f0'; ctx.fillRect(LABEL_W+col*S,0,S,LABEL_H);
+    ctx.fillStyle='#1144aa'; ctx.font='bold 7px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(FAM[fi].r2+'sus',LABEL_W+col*S+S/2,LABEL_H/2-3);
+  });
+
+  // Row headers + cells
+  let row=0;
+  bassOrder.forEach(b=>{
+    const y=LABEL_H+row*S;
+
+    if(b===null){
+      // Divider row
+      ctx.fillStyle='#e8e5e0';
+      ctx.fillRect(0,y,W,4);
+      ctx.fillStyle='#aaa'; ctx.font='7px IBM Plex Mono,monospace'; ctx.textAlign='left';
+      ctx.fillText('── basso fuori scala ──',LABEL_W+4,y+2);
+      row++; return;
+    }
+
+    // Row label
+    const bassInSc=scaleNotes.includes(b);
+    ctx.fillStyle=bassInSc?'#f5f4f0':'#ede9e3';
+    ctx.fillRect(0,y,LABEL_W,S);
+    ctx.fillStyle=bassInSc?'#333':'#bbb';
+    ctx.font=(bassInSc?'bold ':'')+'9px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(NOTE[b],LABEL_W/2,y+S/2+4);
+
+    scalaColOrder.forEach((fi,col)=>{
+      const chordNotes=[b,...getSusNotes(fi)].filter((v,i,a)=>a.indexOf(v)===i);
+      const inCount=chordNotes.filter(n=>scaleNotes.includes(n)).length;
+      const maxCount=chordNotes.length;
+      const {bg,tc}=cellColor(inCount,maxCount,scaleNotes.includes(b));
+      const x=LABEL_W+col*S;
+      const isCur=(b===curBass&&fi===curFam);
+
+      ctx.fillStyle=isCur?'#111':bg; ctx.fillRect(x+1,y+1,S-2,S-2);
+      ctx.fillStyle=isCur?'#fff':tc;
+      ctx.font='bold 11px IBM Plex Mono,monospace'; ctx.textAlign='center';
+      ctx.fillText(inCount,x+S/2,y+S/2+4);
+    });
+    row++;
+  });
+
+  // Grid
+  ctx.strokeStyle='#ddd'; ctx.lineWidth=0.5;
+  for(let i=0;i<=12;i++){
+    ctx.beginPath();ctx.moveTo(LABEL_W+i*S,0);ctx.lineTo(LABEL_W+i*S,H);ctx.stroke();
+  }
+  let rowY=LABEL_H;
+  bassOrder.forEach(b=>{
+    ctx.beginPath();ctx.moveTo(0,rowY);ctx.lineTo(W,rowY);ctx.stroke();
+    rowY+=S;
+  });
+  ctx.strokeStyle='#aaa'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(LABEL_W,0);ctx.lineTo(LABEL_W,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,LABEL_H);ctx.lineTo(W,LABEL_H);ctx.stroke();
+
+  ctx.fillStyle='#888'; ctx.font='7.5px IBM Plex Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('Verde=tutte note in scala. Righe grigie=basso fuori scala.',LABEL_W,H-3);
+
+  // Store layout for click handler
+  canvas._bassOrder=bassOrder;
+  canvas._S=S; canvas._LW=LABEL_W; canvas._LH=LABEL_H;
+}
+
+function initScala(){
+  const selRoot=document.getElementById('scala-root');
+  const selMode=document.getElementById('scala-mode');
+  NOTE.forEach((n,i)=>{const o=document.createElement('option');o.value=i;o.textContent=n;selRoot.appendChild(o);});
+  Object.keys(SCALES).forEach(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;selMode.appendChild(o);});
+  selRoot.addEventListener('change',renderScala);
+  selMode.addEventListener('change',renderScala);
+
+  document.getElementById('scala-view-sus').addEventListener('click',()=>{
+    scalaView='sus';
+    document.getElementById('scala-view-sus').classList.add('active');
+    document.getElementById('scala-view-chord').classList.remove('active');
+    document.getElementById('scala-sus-view').style.display='';
+    document.getElementById('scala-chord-view').style.display='none';
+    renderScala();
+  });
+  document.getElementById('scala-view-chord').addEventListener('click',()=>{
+    scalaView='chord';
+    document.getElementById('scala-view-chord').classList.add('active');
+    document.getElementById('scala-view-sus').classList.remove('active');
+    document.getElementById('scala-sus-view').style.display='none';
+    document.getElementById('scala-chord-view').style.display='';
+    renderScala();
+  });
+
+  document.getElementById('scala-bass-chrom').addEventListener('click',()=>{
+    scalaBassCOF=false;
+    document.getElementById('scala-bass-chrom').classList.add('active');
+    document.getElementById('scala-bass-cof').classList.remove('active');
+    if(scalaView==='chord') renderScala();
+  });
+  document.getElementById('scala-bass-cof').addEventListener('click',()=>{
+    scalaBassCOF=true;
+    document.getElementById('scala-bass-cof').classList.add('active');
+    document.getElementById('scala-bass-chrom').classList.remove('active');
+    if(scalaView==='chord') renderScala();
+  });
+  document.getElementById('scala-sus-chrom').addEventListener('click',()=>{
+    scalaSusCOF=false;
+    document.getElementById('scala-sus-chrom').classList.add('active');
+    document.getElementById('scala-sus-cof').classList.remove('active');
+    if(scalaView==='chord') renderScala();
+  });
+  document.getElementById('scala-sus-cof').addEventListener('click',()=>{
+    scalaSusCOF=true;
+    document.getElementById('scala-sus-cof').classList.add('active');
+    document.getElementById('scala-sus-chrom').classList.remove('active');
+    if(scalaView==='chord') renderScala();
+  });
+  document.getElementById('scala-show-out').addEventListener('click',()=>{
+    scalaShowOutBass=true;
+    document.getElementById('scala-show-out').classList.add('active');
+    document.getElementById('scala-hide-out').classList.remove('active');
+    if(scalaView==='chord') renderScala();
+  });
+  document.getElementById('scala-hide-out').addEventListener('click',()=>{
+    scalaShowOutBass=false;
+    document.getElementById('scala-hide-out').classList.add('active');
+    document.getElementById('scala-show-out').classList.remove('active');
+    if(scalaView==='chord') renderScala();
+  });
+
+  // Canvas click: select chord
+  document.getElementById('scala-canvas').addEventListener('click',e=>{
+    const canvas=document.getElementById('scala-canvas');
+    if(!canvas._bassOrder) return;
+    const rect=canvas.getBoundingClientRect();
+    const S=canvas._S, LABEL_W=canvas._LW, LABEL_H=canvas._LH;
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    const mx=(e.clientX-rect.left)*sx, my=(e.clientY-rect.top)*sy;
+    const col=Math.floor((mx-LABEL_W)/S);
+    const row=Math.floor((my-LABEL_H)/S);
+    if(col<0||col>11||row<0||row>=canvas._bassOrder.length) return;
+    const b=canvas._bassOrder[row];
+    if(b===null) return; // divider
+    const _colOrder=scalaSusCOF?COF_ORDER:[0,1,2,3,4,5,6,7,8,9,10,11];
+    const fi=_colOrder[col];
+    selBass.value=b; selSus.value=fi; curBass=b; curFam=fi;
+    resetVL();
+    playVoicing(buildVoicing(b,getSusNotes(fi),null,'above',curBassOct,curFifths),false);
+    setTimeout(()=>{render();renderScalaChord();},250);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: MODULAZIONE
+// ═══════════════════════════════════════════════════════════════
+// Build the COF-like cycle for any interval
+// interval=7 → COF, interval=2 → M2 chromatic cycle, etc.
+function buildCycle(interval){
+  // Starting from fi=0 (Csus), step by `interval` semitones in sus space
+  // Sus families ordered by root pitch (fi = root index)
+  // We step through sus roots by semitone interval
+  const cycle=[];
+  let cur=0;
+  for(let i=0;i<12;i++){
+    cycle.push(cur);
+    cur=(cur+interval)%12;
+    if(cur===0&&i<11) break; // cycle complete early for divisors
+  }
+  return cycle; // array of fi indices visited
+}
+
+function getPathByInterval(fromFi, toFi, interval, dir){
+  // Build the cycle starting from fromFi, stepping by interval
+  // dir: 1=forward, -1=backward, 0=auto shortest
+  const visited=new Set();
+  const fwdPath=[fromFi];
+  let cur=fromFi;
+  for(let i=0;i<24;i++){
+    cur=(cur+interval)%12;
+    fwdPath.push(cur);
+    if(cur===toFi) break;
+    if(visited.has(cur)) break; // cycle without reaching target
+    visited.add(cur);
+  }
+  const bwdPath=[fromFi];
+  cur=fromFi;
+  const visited2=new Set();
+  for(let i=0;i<24;i++){
+    cur=(cur-interval+12)%12;
+    bwdPath.push(cur);
+    if(cur===toFi) break;
+    if(visited2.has(cur)) break;
+    visited2.add(cur);
+  }
+  const fwdReaches=fwdPath[fwdPath.length-1]===toFi;
+  const bwdReaches=bwdPath[bwdPath.length-1]===toFi;
+  if(dir===0){
+    if(!fwdReaches&&!bwdReaches) return fwdPath; // fallback: full cycle
+    if(!fwdReaches) return bwdPath;
+    if(!bwdReaches) return fwdPath;
+    return fwdPath.length<=bwdPath.length?fwdPath:bwdPath;
+  }
+  if(dir===1) return fwdReaches?fwdPath:fwdPath;
+  return bwdReaches?bwdPath:bwdPath;
+}
+
+// Legacy COF path (kept for compatibility)
+function getPath(fromFi, toFi, dir){ return getPathByInterval(fromFi,toFi,7,dir); }
+
+function renderModPath(fromFi, toFi, dir, label){
+  const path=getPath(fromFi,toFi,dir);
+  const el=document.getElementById('mod-content');
+  el.innerHTML='';
+
+  const block=document.createElement('div');
+  block.className='cadence-block';
+
+  let html=`<div class="cad-title">${label}</div>`;
+  html+=`<div class="cad-desc" style="margin-bottom:12px">${path.length-1} passo/i sul cerchio delle quinte</div>`;
+  html+=`<div class="cad-seq" style="flex-wrap:wrap;">`;
+
+  path.forEach((fi,i)=>{
+    const sn=getSusNotes(fi), mv=i<path.length-1?getMovement(fi,path[i+1]):null;
+    html+=`<div class="cad-step${fi===fromFi||fi===toFi?' current':''}">
+      <div class="cad-step-label">${FAM[fi].r2}sus2 = ${FAM[fi].r4}sus4</div>
+      <div class="cad-step-name">{${sn.map(n=>NOTE[n]).join(' ')}}</div>
+      ${mv?`<div style="font-family:var(--mono);font-size:7.5px;color:var(--muted);margin-top:3px">${NOTE[mv.fromNote]}→${NOTE[mv.toNote]} (${mv.semUp>0?'+':''}${mv.semUp}st)</div>`:''}
+      <div class="cad-step-btns" style="margin-top:6px">
+        <button class="cpbtn" data-fi="${fi}">▶</button>
+        <button class="cpbtn arp" data-fi="${fi}">⤵</button>
+      </div>
+    </div>`;
+    if(i<path.length-1) html+=`<div class="cad-arrow">→</div>`;
+  });
+  html+=`</div>`;
+  html+=`<div style="display:flex;gap:6px;margin-top:10px">
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-seq">▶ Suona tutto</button>
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-arp">⤵ Arpeggia tutto</button>
+  </div>`;
+
+  block.innerHTML=html;
+
+  // Wire step buttons
+  block.querySelectorAll('.cpbtn:not(.arp)').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const fi=parseInt(btn.dataset.fi);
+      const sn=getSusNotes(fi);
+      if(mappaPlayMode==='vl') playVoicing(buildVLVoicing(sn[0],sn,curBassOct,curFifths),false);
+      else { resetVL(); playVoicing(buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths),false); }
+    });
+  });
+  block.querySelectorAll('.cpbtn.arp').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const fi=parseInt(btn.dataset.fi);
+      const sn=getSusNotes(fi);
+      playVoicing(buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths),true);
+    });
+  });
+
+  // Sequence play
+  block.querySelector('#mod-play-seq').addEventListener('click',()=>{
+    resetVL();
+    let t=0;
+    path.forEach(fi=>{
+      const sn=getSusNotes(fi);
+      const v = mappaPlayMode==='vl'
+        ? buildVLVoicing(sn[0],sn,curBassOct,curFifths)
+        : buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths);
+      v.forEach(vv=>playNote(vv.note,vv.oct,t,vv.vel||0.52));
+      t+=0.85;
+    });
+  });
+  block.querySelector('#mod-play-arp').addEventListener('click',()=>{
+    resetVL();
+    let t=0;
+    path.forEach(fi=>{
+      const sn=getSusNotes(fi);
+      const v=buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths);
+      const sorted=[...v].sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note));
+      sorted.forEach((vv,i)=>playNote(vv.note,vv.oct,t+i*0.11,vv.vel||0.55));
+      t+=0.9;
+    });
+  });
+
+  el.appendChild(block);
+}
+
+let modInterval=7; // current interval for modulazione
+
+function renderModulazione(){
+  const fromFi=parseInt(document.getElementById('mod-from').value);
+  const toFi=parseInt(document.getElementById('mod-to').value);
+  const btnBar=document.getElementById('mod-path-btns');
+  btnBar.innerHTML='';
+
+  if(fromFi===toFi){
+    document.getElementById('mod-content').innerHTML='<div class="insight">Seleziona due famiglie sus diverse.</div>';
+    return;
+  }
+
+  const fwdPath=getPathByInterval(fromFi,toFi,modInterval,1);
+  const bwdPath=getPathByInterval(fromFi,toFi,modInterval,-1);
+  const fwdReaches=fwdPath[fwdPath.length-1]===toFi;
+  const bwdReaches=bwdPath[bwdPath.length-1]===toFi;
+
+  const INTERVAL_NAMES={1:'m2',2:'M2',3:'m3',4:'M3',5:'P4',6:'TT',7:'P5',8:'m6',9:'M6',10:'m7',11:'M7'};
+  const intName=INTERVAL_NAMES[modInterval]||modInterval+'st';
+
+  const options=[];
+  if(fwdReaches) options.push({label:`↑ ${intName} (${fwdPath.length-1} passi)`,path:fwdPath});
+  if(bwdReaches&&JSON.stringify(bwdPath)!==JSON.stringify(fwdPath)) options.push({label:`↓ ${intName} (${bwdPath.length-1} passi)`,path:bwdPath});
+  if(!fwdReaches&&!bwdReaches){
+    // interval doesn't reach toFi — show the full cycle from fromFi
+    const cycle=getPathByInterval(fromFi,fromFi,modInterval,1);
+    options.push({label:`Ciclo completo per ${intName} (${cycle.length-1} passi)`,path:cycle});
+  }
+
+  options.forEach((opt,idx)=>{
+    const btn=document.createElement('button');
+    btn.className='pbtn'; btn.textContent=opt.label;
+    btn.style.cssText='font-size:8px;padding:5px 12px';
+    btn.addEventListener('click',()=>{
+      btnBar.querySelectorAll('.pbtn').forEach(b=>{b.style.background='#1e1e1e';b.style.color='#ccc';});
+      btn.style.background='#fff';btn.style.color='#111';btn.style.borderColor='#fff';
+      renderModPathFromArray(fromFi,toFi,opt.path,opt.label);
+    });
+    btnBar.appendChild(btn);
+    if(idx===0){
+      btn.style.background='#fff';btn.style.color='#111';btn.style.borderColor='#fff';
+      renderModPathFromArray(fromFi,toFi,opt.path,opt.label);
+    }
+  });
+}
+
+function renderModPathFromArray(fromFi, toFi, path, label){
+  const el=document.getElementById('mod-content');
+  el.innerHTML='';
+  const block=document.createElement('div');
+  block.className='cadence-block';
+  let html=`<div class="cad-title">${label}</div>`;
+  html+=`<div class="cad-seq" style="flex-wrap:wrap;">`;
+  path.forEach((fi,i)=>{
+    const sn=getSusNotes(fi);
+    const nextFi=i<path.length-1?path[i+1]:null;
+    const mv=nextFi!==null?getMovement(fi,nextFi):null;
+    html+=`<div class="cad-step${(fi===fromFi||fi===toFi)?' current':''}">
+      <div class="cad-step-label">${FAM[fi].r2}sus</div>
+      <div class="cad-step-name">{${sn.map(n=>NOTE[n]).join(' ')}}</div>
+      ${mv?`<div style="font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:2px">${NOTE[mv.fromNote]}→${NOTE[mv.toNote]} (${mv.semUp>0?'+':''}${mv.semUp}st)</div>`:''}
+      <div class="cad-step-btns" style="margin-top:5px">
+        <button class="cpbtn" data-fi="${fi}">▶</button>
+        <button class="cpbtn arp" data-fi="${fi}">⤵</button>
+      </div>
+    </div>`;
+    if(i<path.length-1) html+=`<div class="cad-arrow">→</div>`;
+  });
+  html+=`</div><div style="display:flex;gap:6px;margin-top:10px">
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-seq">▶ Tutto</button>
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-arp">⤵ Arpeggia</button>
+  </div>`;
+  block.innerHTML=html;
+
+  block.querySelectorAll('.cpbtn:not(.arp)').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const fi=parseInt(btn.dataset.fi);const sn=getSusNotes(fi);
+      if(mappaPlayMode==='vl') playVoicing(buildVLVoicing(sn[0],sn,curBassOct,curFifths),false);
+      else {resetVL();playVoicing(buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths),false);}
+    });
+  });
+  block.querySelectorAll('.cpbtn.arp').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const fi=parseInt(btn.dataset.fi);const sn=getSusNotes(fi);
+      playVoicing(buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths),true);
+    });
+  });
+  block.querySelector('#mod-play-seq').addEventListener('click',()=>{
+    resetVL();let t=0;
+    path.forEach(fi=>{
+      const sn=getSusNotes(fi);
+      const v=mappaPlayMode==='vl'?buildVLVoicing(sn[0],sn,curBassOct,curFifths):buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths);
+      v.forEach(vv=>playNote(vv.note,vv.oct,t,vv.vel||0.52));t+=0.85;
+    });
+  });
+  block.querySelector('#mod-play-arp').addEventListener('click',()=>{
+    resetVL();let t=0;
+    path.forEach(fi=>{
+      const sn=getSusNotes(fi);
+      const v=buildVoicing(sn[0],sn,null,'above',curBassOct,curFifths);
+      [...v].sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note)).forEach((vv,i)=>playNote(vv.note,vv.oct,t+i*0.11,vv.vel||0.55));
+      t+=0.9;
+    });
+  });
+  el.appendChild(block);
+}
+
+function initModulazione(){
+  const selFrom=document.getElementById('mod-from');
+  const selTo=document.getElementById('mod-to');
+  FAM.forEach((f,i)=>{
+    [selFrom,selTo].forEach(sel=>{
+      const o=document.createElement('option');o.value=i;o.textContent=f.r2+'sus';sel.appendChild(o);
+    });
+  });
+  selTo.value=6;
+  selFrom.addEventListener('change',renderModulazione);
+  selTo.addEventListener('change',renderModulazione);
+
+  // Interval buttons
+  document.querySelectorAll('[data-interval]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('[data-interval]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      modInterval=parseInt(btn.dataset.interval);
+      renderModulazione();
+    });
+  });
+
+  renderModulazione();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT ALL NEW TABS
+// ═══════════════════════════════════════════════════════════════
+function initNewTabs(){
+  initDecomp();
+  initDistanza();
+  initScala();
+  initModulazione();
+  renderScala();
+  // tab visibility handled by main tab handler
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// PIANO PREVIEW
+// ═══════════════════════════════════════════════════════════════
+const PIANO_WHITES = [0,2,4,5,7,9,11]; // C D E F G A B (pitch classes of white keys)
+const PIANO_BLACKS = [1,3,null,6,8,10,null]; // C# D# - F# G# A# - (indexed by white gap)
+// 3 octaves: 2,3,4,5 = octaves shown
+const PIANO_OCTS = [2,3,4,5];
+
+// Active notes: Map of "note-oct" → { until: timestamp, vel }
+const pianoActive = new Map();
+
+function pianoKey(note, oct){ return note+'-'+oct; }
+
+let _pianoTimer = null;
+
+function pianoHighlight(voices, durationMs=1800){
+  // Clear all previous highlights immediately
+  pianoActive.clear();
+  if(_pianoTimer) { clearTimeout(_pianoTimer); _pianoTimer=null; }
+
+  const until = performance.now() + durationMs;
+  voices.forEach(v=>{
+    pianoActive.set(pianoKey(v.note, v.oct), {until, vel: v.vel||0.5, bass: !!v.bass});
+  });
+  drawPiano();
+  _pianoTimer = setTimeout(()=>{ pianoActive.clear(); drawPiano(); _pianoTimer=null; }, durationMs+50);
+}
+
+function drawPiano(){
+  const canvas = document.getElementById('piano-canvas');
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  if(!W||!H) return;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.clearRect(0,0,W,H);
+
+  const now = performance.now();
+  const totalWhites = PIANO_OCTS.length * 7;
+  const ww = W / totalWhites; // white key width
+  const wh = H;
+  const bw = ww * 0.6, bh = wh * 0.62;
+
+  // Draw white keys
+  PIANO_OCTS.forEach((oct, oi) => {
+    PIANO_WHITES.forEach((pc, wi) => {
+      const x = (oi * 7 + wi) * ww;
+      const key = pianoKey(pc, oct);
+      const active = pianoActive.has(key) && pianoActive.get(key).until > now;
+      const vel = active ? (pianoActive.get(key).vel||0.5) : 0;
+
+      // White key background
+      const isBassKey = active && pianoActive.get(key).bass;
+      ctx.fillStyle = active
+        ? (isBassKey ? `hsl(0,55%,${78-vel*15}%)` : `hsl(220,70%,${85-vel*25}%)`)
+        : '#fff';
+      ctx.fillRect(x+0.5, 0.5, ww-1, wh-1);
+      ctx.strokeStyle = '#ccc'; ctx.lineWidth = 0.5;
+      ctx.strokeRect(x+0.5, 0.5, ww-1, wh-1);
+
+      // Note label on white key
+      if(wi===0){ // C — show octave label
+        ctx.fillStyle = active ? '#fff' : '#ccc';
+        ctx.font = `${Math.max(7,ww*0.45)}px IBM Plex Mono,monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText('C'+oct, x+ww/2, wh-4);
+      }
+    });
+  });
+
+  // Draw black keys (on top)
+  PIANO_OCTS.forEach((oct, oi) => {
+    // Black key positions: after white keys 0,1,3,4,5 (i.e. gaps C#,D#,F#,G#,A#)
+    const blackPositions = [
+      {wi:0, pc:1},  // C# after C
+      {wi:1, pc:3},  // D# after D
+      {wi:3, pc:6},  // F# after F
+      {wi:4, pc:8},  // G# after G
+      {wi:5, pc:10}, // A# after A
+    ];
+    blackPositions.forEach(({wi, pc}) => {
+      const x = (oi * 7 + wi) * ww + ww - bw/2;
+      const key = pianoKey(pc, oct);
+      const active = pianoActive.has(key) && pianoActive.get(key).until > now;
+      const vel = active ? (pianoActive.get(key).vel||0.5) : 0;
+
+      const isBassOct = active && pianoActive.get(key).bass;
+      ctx.fillStyle = active
+        ? (isBassOct ? `hsl(0,55%,${42+vel*12}%)` : `hsl(220,70%,${44+vel*12}%)`)
+        : '#222';
+      ctx.fillRect(x, 0, bw, bh);
+      // Subtle highlight on top of black key
+      if(!active){
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(x, 0, bw, bh*0.3);
+      }
+    });
+  });
+
+  // Oct divider lines
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+  PIANO_OCTS.forEach((oct,oi)=>{
+    const x = oi*7*ww;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,wh); ctx.stroke();
+  });
+}
+
+
+
+// Init piano
+function initPiano(){
+  const canvas = document.getElementById('piano-canvas');
+  // Redraw on resize
+  new ResizeObserver(()=>requestAnimationFrame(drawPiano)).observe(canvas);
+  drawPiano();
+
+  // Click piano key to play note
+  canvas.addEventListener('click', e=>{
+    const W=canvas.clientWidth, H=canvas.clientHeight;
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    const totalWhites=PIANO_OCTS.length*7;
+    const ww=W/totalWhites, wh=H, bw=ww*0.6, bh=wh*0.62;
+    const col=Math.floor(mx/ww);
+    const oi=Math.floor(col/7), wi=col%7;
+    if(oi>=PIANO_OCTS.length) return;
+    const oct=PIANO_OCTS[oi];
+
+    // Check if black key was clicked
+    const blackPositions=[{wi:0,pc:1},{wi:1,pc:3},{wi:3,pc:6},{wi:4,pc:8},{wi:5,pc:10}];
+    let played=false;
+    if(my<bh){
+      blackPositions.forEach(({wi:bwi,pc})=>{
+        if(!played){
+          const bx=(oi*7+bwi)*ww+ww-bw/2;
+          if(mx>=bx&&mx<bx+bw){ playNote(pc,oct,0,0.6); played=true; }
+        }
+      });
+    }
+    if(!played){
+      const pc=PIANO_WHITES[wi];
+      playNote(pc,oct,0,0.6);
+      pianoHighlight([{note:pc,oct,vel:0.6}],1500);
+    }
+  });
+}
+
+render();
+initMappa();
+initNewTabs();
+initPiano();
+</script>
+</body>
+</html>
