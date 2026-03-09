@@ -204,11 +204,11 @@ select:focus { outline:none; border-color:#666; }
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 20px 6px 16px;
+  gap: 10px;
+  padding: 6px 16px 6px 12px;
   z-index: 100;
   box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
-  height: 72px;
+  height: 90px;
 }
 #piano-label {
   font-family: var(--mono);
@@ -220,10 +220,10 @@ select:focus { outline:none; border-color:#666; }
   white-space: nowrap;
   flex-shrink: 0;
 }
-#piano-canvas { display: block; flex: 1; height: 56px; cursor: pointer; }
+#piano-canvas { display: block; flex: 1; height: 72px; cursor: pointer; min-width: 0; }
 
 /* Add bottom padding to content so piano bar doesn't cover it */
-.content { padding-bottom: 100px; }
+.content { padding-bottom: 120px; }
 
 </style>
 </head>
@@ -234,11 +234,11 @@ select:focus { outline:none; border-color:#666; }
   <h1><b>Sus</b> Lab</h1>
   <div class="controls">
     <div class="ctrl-wrap">
-      <div class="ctrl-label">Basso</div>
+      <div class="ctrl-label" data-it="Basso" data-en="Bass">Basso</div>
       <select id="sel-bass"></select>
     </div>
     <div class="ctrl-wrap">
-      <div class="ctrl-label">Upper Sus</div>
+      <div class="ctrl-label" data-it="Upper Sus" data-en="Upper Sus">Upper Sus</div>
       <div style="display:flex;gap:6px;align-items:center;">
         <select id="sel-sus"></select>
         <button id="btn-flip-sus" title="Alterna struttura: 1-2-5 (sus2) ↔ 1-4-5 (sus4)"
@@ -248,14 +248,14 @@ select:focus { outline:none; border-color:#666; }
       </div>
     </div>
     <div class="ctrl-wrap">
-      <div class="ctrl-label">Ottava basso</div>
+      <div class="ctrl-label" data-it="Ottava basso" data-en="Bass octave">Ottava basso</div>
       <select id="sel-oct">
         <option value="2" selected>-2 ottave dal sus</option>
         <option value="3">-1 ottava dal sus</option>
       </select>
     </div>
     <div class="ctrl-wrap">
-      <div class="ctrl-label">Quinte al basso</div>
+      <div class="ctrl-label" data-it="Quinte al basso" data-en="Bass fifths">Quinte al basso</div>
       <select id="sel-fifths">
         <option value="0" selected>0 (solo basso)</option>
         <option value="1">1 (+ quinta sotto)</option>
@@ -264,9 +264,10 @@ select:focus { outline:none; border-color:#666; }
       </select>
     </div>
     <div class="play-global">
-      <button class="pbtn" id="btn-chord">▶ Accordo</button>
-      <button class="pbtn" id="btn-arp">⤵ Arpeggio</button>
+      <button class="pbtn" id="btn-chord" data-it="▶ Accordo" data-en="▶ Chord">▶ Accordo</button>
+      <button class="pbtn" id="btn-arp" data-it="⤵ Arpeggio" data-en="⤵ Arpeggio">⤵ Arpeggio</button>
     </div>
+    <button id="btn-lang" style="font-family:var(--mono);font-size:8px;padding:5px 10px;border:1px solid var(--border);border-radius:3px;background:#f5f4f0;cursor:pointer;letter-spacing:1px;margin-left:8px;">🇬🇧 EN</button>
   </div>
 </div>
 
@@ -275,16 +276,16 @@ select:focus { outline:none; border-color:#666; }
 
 <!-- TABS -->
 <div class="tabs-bar">
-  <div class="tab active" data-tab="added">+ Nota aggiunta</div>
-  <div class="tab" data-tab="mutations">Mutazioni sus</div>
-  <div class="tab" data-tab="inversions">Inversioni</div>
-  <div class="tab" data-tab="cadences">Cadenze</div>
-  <div class="tab" data-tab="circle">Cerchio</div>
-  <div class="tab" data-tab="mappa">Mappa</div>
-  <div class="tab" data-tab="decomp">Decomposizione</div>
-  <div class="tab" data-tab="distanza">Distanza</div>
-  <div class="tab" data-tab="scala">Scala</div>
-  <div class="tab" data-tab="modulazione">Modulazione</div>
+  <div class="tab active" data-tab="added" data-it="+ Nota aggiunta" data-en="+ Added note">+ Nota aggiunta</div>
+  <div class="tab" data-tab="mutations" data-it="Mutazioni sus" data-en="Sus mutations">Mutazioni sus</div>
+  <div class="tab" data-tab="inversions" data-it="Inversioni" data-en="Inversions">Inversioni</div>
+  <div class="tab" data-tab="cadences" data-it="Cadenze" data-en="Cadences">Cadenze</div>
+  <div class="tab" data-tab="circle" data-it="Cerchio" data-en="Circle">Cerchio</div>
+  <div class="tab" data-tab="mappa" data-it="Mappa" data-en="Map">Mappa</div>
+  <div class="tab" data-tab="decomp" data-it="Decomposizione" data-en="Decomposition">Decomposizione</div>
+  <div class="tab" data-tab="distanza" data-it="Distanza" data-en="Distance">Distanza</div>
+  <div class="tab" data-tab="scala" data-it="Scala" data-en="Scale">Scala</div>
+  <div class="tab" data-tab="modulazione" data-it="Modulazione" data-en="Modulation">Modulazione</div>
 </div>
 
 <div class="content">
@@ -299,17 +300,17 @@ select:focus { outline:none; border-color:#666; }
 
   <!-- TAB: MUTAZIONI -->
   <div class="panel" id="tab-mutations">
-    <div class="section-label">▸ Cambia 1 nota del sus (±1 semitono)</div>
+    <div class="section-label" data-it="▸ Cambia 1 nota del sus (±1 semitono)" data-en="▸ Change 1 sus note (±1 semitone)">▸ Cambia 1 nota del sus (±1 semitono)</div>
     <div class="mut-grid" id="grid-mut1"></div>
-    <div class="section-label">▸ Cambia 2 note del sus (±1 semitono)</div>
+    <div class="section-label" data-it="▸ Cambia 2 note del sus (±1 semitono)" data-en="▸ Change 2 sus notes (±1 semitone)">▸ Cambia 2 note del sus (±1 semitono)</div>
     <div class="mut-grid" id="grid-mut2"></div>
-    <div class="section-label">▸ Triadi — sposta note del sus verso triadi vicine</div>
+    <div class="section-label" data-it="▸ Triadi — sposta note del sus verso triadi vicine" data-en="▸ Triads — move sus notes toward nearby triads">▸ Triadi — sposta note del sus verso triadi vicine</div>
     <div class="mut-grid" id="grid-triads"></div>
   </div>
 
   <!-- TAB: INVERSIONI -->
   <div class="panel" id="tab-inversions">
-    <div class="section-label">▸ Ogni nota dell'accordo come basso</div>
+    <div class="section-label" data-it="▸ Ogni nota dell'accordo come basso" data-en="▸ Each chord note as bass">▸ Ogni nota dell'accordo come basso</div>
     <div class="inv-grid" id="grid-inv"></div>
     <div class="insight" id="insight-inv"></div>
   </div>
@@ -323,32 +324,32 @@ select:focus { outline:none; border-color:#666; }
   <div class="panel" id="tab-mappa">
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Basso</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Basso" data-en="Bass">Basso</div>
         <div style="display:flex;gap:4px;">
-          <button class="pbtn mappa-sort active" id="mappa-chrom" style="font-size:8px;padding:5px 10px;">Cromatico</button>
-          <button class="pbtn mappa-sort" id="mappa-cof" style="font-size:8px;padding:5px 10px;">Cerchio 5e</button>
+          <button class="pbtn mappa-sort active" id="mappa-chrom" data-it="Cromatico" data-en="Chromatic" style="font-size:8px;padding:5px 10px;">Cromatico</button>
+          <button class="pbtn mappa-sort" id="mappa-cof" data-it="Cerchio 5e" data-en="Circle of 5ths" style="font-size:8px;padding:5px 10px;">Cerchio 5e</button>
         </div>
       </div>
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Sus (colonne)</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Sus (colonne)" data-en="Sus (columns)">Sus (colonne)</div>
         <div style="display:flex;gap:4px;">
-          <button class="pbtn mappa-sort" id="mappa-sus-chrom" style="font-size:8px;padding:5px 10px;">Cromatico</button>
-          <button class="pbtn mappa-sort active" id="mappa-sus-cof" style="font-size:8px;padding:5px 10px;">Cerchio 5e</button>
+          <button class="pbtn mappa-sort" id="mappa-sus-chrom" data-it="Cromatico" data-en="Chromatic" style="font-size:8px;padding:5px 10px;">Cromatico</button>
+          <button class="pbtn mappa-sort active" id="mappa-sus-cof" data-it="Cerchio 5e" data-en="Circle of 5ths" style="font-size:8px;padding:5px 10px;">Cerchio 5e</button>
         </div>
       </div>
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Vista</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Vista" data-en="View">Vista</div>
         <div style="display:flex;gap:4px;">
-          <button class="pbtn mappa-sort active" id="mappa-view-normal" style="font-size:8px;padding:5px 10px;">Normale</button>
-          <button class="pbtn mappa-sort" id="mappa-view-parallel" style="font-size:8px;padding:5px 10px;">Parallela</button>
+          <button class="pbtn mappa-sort active" id="mappa-view-normal" data-it="Normale" data-en="Normal" style="font-size:8px;padding:5px 10px;">Normale</button>
+          <button class="pbtn mappa-sort" id="mappa-view-parallel" data-it="Parallela" data-en="Parallel" style="font-size:8px;padding:5px 10px;">Parallela</button>
         </div>
       </div>
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Suona al click</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Suona al click" data-en="Play on click">Suona al click</div>
         <div style="display:flex;gap:4px;">
-          <button class="pbtn mappa-sort active" id="mappa-mode-off"  style="font-size:8px;padding:5px 10px;">Off</button>
-          <button class="pbtn mappa-sort"        id="mappa-mode-sus"  style="font-size:8px;padding:5px 10px;">Forma sus</button>
-          <button class="pbtn mappa-sort"        id="mappa-mode-vl"   style="font-size:8px;padding:5px 10px;">Voice leading</button>
+          <button class="pbtn mappa-sort active" id="mappa-mode-off" data-it="Off" data-en="Off"  style="font-size:8px;padding:5px 10px;">Off</button>
+          <button class="pbtn mappa-sort"        id="mappa-mode-sus" data-it="Forma sus" data-en="Sus shape"  style="font-size:8px;padding:5px 10px;">Forma sus</button>
+          <button class="pbtn mappa-sort"        id="mappa-mode-vl" data-it="Voice leading" data-en="Voice leading"   style="font-size:8px;padding:5px 10px;">Voice leading</button>
         </div>
         <button class="pbtn" id="mappa-reset-vl" style="font-size:8px;padding:5px 10px;opacity:0.4;pointer-events:none;" title="Azzera memoria voice leading">↺ reset VL</button>
       </div>
@@ -370,14 +371,14 @@ select:focus { outline:none; border-color:#666; }
   <div class="panel" id="tab-decomp">
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Note accordo</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Note accordo" data-en="Chord notes">Note accordo</div>
         <input id="decomp-input" type="text" placeholder="es. C Eb G Bb F"
           style="font-family:var(--mono);font-size:11px;padding:6px 10px;border:1px solid var(--border);border-radius:3px;background:#fff;width:200px;">
-        <button class="pbtn" id="decomp-btn" style="font-size:8px;padding:6px 12px;">Analizza</button>
+        <button class="pbtn" id="decomp-btn" style="font-size:8px;padding:6px 12px;" data-it="Analizza" data-en="Analyze">Analizza</button>
       </div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">oppure usa basso+sus selezionato sopra → <button class="pbtn" id="decomp-from-sel" style="font-size:8px;padding:4px 8px;">Usa selezione</button></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);" data-it="oppure usa basso+sus selezionato sopra →" data-en="or use selected bass+sus above →">oppure usa basso+sus selezionato sopra → <button class="pbtn" id="decomp-from-sel" style="font-size:8px;padding:4px 8px;" data-it="Usa selezione" data-en="Use selection">Usa selezione</button></div>
     </div>
-    <div class="section-label" id="decomp-label">▸ Coppie di sus che coprono l'accordo</div>
+    <div class="section-label" id="decomp-label" data-it="▸ Coppie di sus che coprono l'accordo" data-en="▸ Sus pairs covering the chord">▸ Coppie di sus che coprono l'accordo</div>
     <div class="grid" id="decomp-grid"></div>
     <div class="insight" id="decomp-insight" style="display:none"></div>
   </div>
@@ -386,13 +387,13 @@ select:focus { outline:none; border-color:#666; }
   <div class="panel" id="tab-distanza">
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Vista</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Vista" data-en="View">Vista</div>
         <div style="display:flex;gap:4px;">
-          <button class="pbtn mappa-sort active" id="dist-mode-sus" style="font-size:8px;padding:5px 10px;">Famiglie sus</button>
-          <button class="pbtn mappa-sort" id="dist-mode-chord" style="font-size:8px;padding:5px 10px;">Con basso (vs selezione)</button>
+          <button class="pbtn mappa-sort active" id="dist-mode-sus" data-it="Famiglie sus" data-en="Sus families" style="font-size:8px;padding:5px 10px;">Famiglie sus</button>
+          <button class="pbtn mappa-sort" id="dist-mode-chord" data-it="Con basso (vs selezione)" data-en="With bass (vs selection)" style="font-size:8px;padding:5px 10px;">Con basso (vs selezione)</button>
         </div>
       </div>
-      <div id="dist-desc" style="font-family:var(--mono);font-size:9px;color:var(--muted);">
+      <div id="dist-desc" style="font-family:var(--mono);font-size:9px;color:var(--muted);" data-it="Note in comune tra coppie di famiglie sus. Click per sentire." data-en="Notes in common between sus family pairs. Click to hear.">
         Note in comune tra coppie di famiglie sus. Click per sentire.
       </div>
     </div>
@@ -405,18 +406,18 @@ select:focus { outline:none; border-color:#666; }
   <div class="panel" id="tab-scala">
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Tonica</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Tonica" data-en="Root">Tonica</div>
         <select id="scala-root" style="min-width:80px;"></select>
       </div>
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Modo</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Modo" data-en="Mode">Modo</div>
         <select id="scala-mode" style="min-width:180px;"></select>
       </div>
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
         <div class="ctrl-label" style="color:var(--text)">Vista</div>
         <div style="display:flex;gap:4px;">
-          <button class="pbtn mappa-sort active" id="scala-view-sus" style="font-size:8px;padding:5px 10px;">Famiglie sus</button>
-          <button class="pbtn mappa-sort" id="scala-view-chord" style="font-size:8px;padding:5px 10px;">Con basso</button>
+          <button class="pbtn mappa-sort active" id="scala-view-sus" data-it="Famiglie sus" data-en="Sus families" style="font-size:8px;padding:5px 10px;">Famiglie sus</button>
+          <button class="pbtn mappa-sort" id="scala-view-chord" data-it="Con basso" data-en="With bass" style="font-size:8px;padding:5px 10px;">Con basso</button>
         </div>
       </div>
     </div>
@@ -430,18 +431,18 @@ select:focus { outline:none; border-color:#666; }
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
         <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:6px;">
           <div class="ctrl-label" style="color:var(--text)">Basso</div>
-          <button class="pbtn mappa-sort active" id="scala-bass-chrom" style="font-size:8px;padding:5px 9px;">Cromatico</button>
-          <button class="pbtn mappa-sort" id="scala-bass-cof" style="font-size:8px;padding:5px 9px;">Cerchio 5e</button>
+          <button class="pbtn mappa-sort active" id="scala-bass-chrom" data-it="Cromatico" data-en="Chromatic" style="font-size:8px;padding:5px 9px;">Cromatico</button>
+          <button class="pbtn mappa-sort" id="scala-bass-cof" data-it="Cerchio 5e" data-en="Circle of 5ths" style="font-size:8px;padding:5px 9px;">Cerchio 5e</button>
         </div>
         <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:6px;">
           <div class="ctrl-label" style="color:var(--text)">Sus</div>
-          <button class="pbtn mappa-sort" id="scala-sus-chrom" style="font-size:8px;padding:5px 9px;">Cromatico</button>
-          <button class="pbtn mappa-sort active" id="scala-sus-cof" style="font-size:8px;padding:5px 9px;">Cerchio 5e</button>
+          <button class="pbtn mappa-sort" id="scala-sus-chrom" data-it="Cromatico" data-en="Chromatic" style="font-size:8px;padding:5px 9px;">Cromatico</button>
+          <button class="pbtn mappa-sort active" id="scala-sus-cof" data-it="Cerchio 5e" data-en="Circle of 5ths" style="font-size:8px;padding:5px 9px;">Cerchio 5e</button>
         </div>
         <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:6px;">
           <div class="ctrl-label" style="color:var(--text)">Fuori scala</div>
-          <button class="pbtn mappa-sort" id="scala-show-out" style="font-size:8px;padding:5px 9px;">Separati</button>
-          <button class="pbtn mappa-sort active" id="scala-hide-out" style="font-size:8px;padding:5px 9px;">Integrati</button>
+          <button class="pbtn mappa-sort" id="scala-show-out" data-it="Separati" data-en="Separated" style="font-size:8px;padding:5px 9px;">Separati</button>
+          <button class="pbtn mappa-sort active" id="scala-hide-out" data-it="Integrati" data-en="Integrated" style="font-size:8px;padding:5px 9px;">Integrati</button>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -454,16 +455,16 @@ select:focus { outline:none; border-color:#666; }
   <div class="panel" id="tab-modulazione">
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">Da</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="Da" data-en="From">Da</div>
         <select id="mod-from" style="min-width:140px;"></select>
       </div>
       <div class="ctrl-wrap" style="flex-direction:row;align-items:center;gap:8px;">
-        <div class="ctrl-label" style="color:var(--text)">A</div>
+        <div class="ctrl-label" style="color:var(--text)" data-it="A" data-en="To">A</div>
         <select id="mod-to" style="min-width:140px;"></select>
       </div>
     </div>
     <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
-      <div class="ctrl-label" style="color:var(--text)">Percorso</div>
+      <div class="ctrl-label" style="color:var(--text)" data-it="Percorso" data-en="Path">Percorso</div>
       <button class="pbtn mappa-sort active" id="mod-interval-7" data-interval="7" style="font-size:8px;padding:5px 9px;">P5 ↻</button>
       <button class="pbtn mappa-sort" id="mod-interval-5" data-interval="5" style="font-size:8px;padding:5px 9px;">P4 ↻</button>
       <button class="pbtn mappa-sort" id="mod-interval-2" data-interval="2" style="font-size:8px;padding:5px 9px;">M2 ↑</button>
@@ -484,11 +485,232 @@ select:focus { outline:none; border-color:#666; }
 
 <!-- PIANO PREVIEW (fixed bottom) -->
 <div id="piano-bar">
-  <div id="piano-label">Piano</div>
+  <div id="piano-label" data-it="Piano" data-en="Piano">Piano</div>
   <canvas id="piano-canvas"></canvas>
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════
+// LANGUAGE TOGGLE  (IT ↔ EN)
+// ═══════════════════════════════════════════════════════════════
+let currentLang = 'it';
+
+const STRINGS = {
+  'stabile':    {en:'stable'},
+  'dominante':  {en:'dominant'},
+  'esteso':     {en:'extended'},
+  'politonale': {en:'polytonal'},
+  'double':     {en:'double'},
+  'cluster':    {en:'cluster'},
+  '+ nota':     {en:'+ note'},
+  'dal basso':  {en:'from bass'},
+  'basso:':     {en:'bass:'},
+  '↑ sopra':    {en:'↑ above'},
+  '↔ in mezzo': {en:'↔ middle'},
+  '↓ sotto':    {en:'↓ below'},
+  'INVERSIONI': {en:'INVERSIONS'},
+  'ha':         {en:'has'},
+  'note e quindi': {en:'notes and thus'},
+  'inversioni possibili.': {en:'possible inversions.'},
+  'Ogni inversione cambia il colore armonico dal punto di vista del basso, mantenendo le stesse note superiori.':
+    {en:'Each inversion changes the harmonic color from the bass perspective, keeping the same upper notes.'},
+  'INSIGHT':    {en:'INSIGHT'},
+  'note completano un secondo sus.': {en:'notes complete a second sus.'},
+  'Delle':      {en:'Of the'},
+  'restanti:':  {en:'remaining:'},
+  'stabili,':   {en:'stable,'},
+  'estese/modali,': {en:'extended/modal,'},
+  'dominanti,': {en:'dominant,'},
+  'cluster.':   {en:'cluster.'},
+  '▸ Completano un secondo sus': {en:'▸ Complete a second sus'},
+  '▸ Altre note aggiungibili':   {en:'▸ Other addable notes'},
+  'intervallo:': {en:'interval:'},
+  '▸ Inserisci almeno 3 note': {en:'▸ Enter at least 3 notes'},
+  'Nessuna coppia sus copre esattamente questo insieme di note.': {en:'No sus pair covers exactly this set of notes.'},
+  'coppia sus': {en:'sus pair'},
+  'shared:':    {en:'shared:'},
+  'extra:':     {en:'extra:'},
+  'passi COF':  {en:'COF steps'},
+  'DECOMPOSIZIONE': {en:'DECOMPOSITION'},
+  'Trovate':    {en:'Found'},
+  "coppie sus che coprono l'accordo.": {en:'sus pairs covering the chord.'},
+  'La più vicina sul cerchio:': {en:'Closest on the circle:'},
+  'Nota condivisa:': {en:'Shared note:'},
+  'Nessuna nota condivisa — due sus paralleli.': {en:'No shared note — two parallel sus.'},
+  'Note in comune tra coppie di famiglie sus. Click per sentire.':
+    {en:'Notes in common between sus family pairs. Click to hear.'},
+  'Note in comune tra tutti gli accordi (basso+sus) e la selezione corrente. Click per sentire.':
+    {en:'Notes in common between all chords (bass+sus) and current selection. Click to hear.'},
+  'Note in comune con:': {en:'Notes in common with:'},
+  '▸ Sus contenuti nella scala': {en:'▸ Sus families in scale'},
+  '▸ Fuori scala':               {en:'▸ Out of scale'},
+  '── basso fuori scala ──':     {en:'── bass out of scale ──'},
+  'Verde=tutte note in scala. Righe grigie=basso fuori scala.':
+    {en:'Green=all notes in scale. Grey rows=bass out of scale.'},
+  'ogni passo sposta una nota di m3 (3 semitoni)': {en:'each step moves one note by m3 (3 semitones)'},
+  'muovi':  {en:'move'},
+  '↻ nota scende m3 · root sale P4': {en:'↻ note falls m3 · root rises P4'},
+  '↺ nota sale m3 · root scende P4': {en:'↺ note rises m3 · root falls P4'},
+  'passo/i sul cerchio delle quinte': {en:'step(s) on the circle of fifths'},
+  '⤵ Arpeggia': {en:'⤵ Arpeggiate'},
+  '0=nessuna  1=1 nota  2=2 note  3=stessa famiglia. Click per sentire.': {en:'0=none  1=1 note  2=2 notes  3=same family. Click to hear.'},
+  '▶ Suona sequenza': {en:'▶ Play sequence'},
+  '⤵ Arpeggia sequenza': {en:'⤵ Arpeggiate sequence'},
+  'note cambiate': {en:'notes changed'},
+  'clockwise': {en:'clockwise'},
+  'counter-clockwise': {en:'counter-clockwise'},
+  'dentro': {en:'in'},
+  'fuori': {en:'out'},
+  'nota': {en:'note'},
+  'note': {en:'notes'},
+  'estranee:': {en:'foreign:'},
+  '▸ Fuori scala — note estranee in rosso': {en:'▸ Out of scale — foreign notes in red'},
+  'passi': {en:'steps'},
+  'Ciclo completo per': {en:'Full cycle for'},
+  'cad1_mid': {en:', bass descends chromatically from', it:', il basso scende cromaticamente da'},
+  '. Il nome dell\'accordo cambia a ogni semitono.': {en:'. Chord name changes at every semitone.'},
+  '▶ Suona tutto': {en:'▶ Play all'},
+  '⤵ Arpeggia tutto': {en:'⤵ Arpeggiate all'},
+  '▶ Tutto': {en:'▶ All'},
+  'Il sus rimane': {en:'Sus stays'},
+  ', il basso si muove per quinte perfette. Movimento tipico del basso jazz.': {en:'. Bass moves in perfect fifths. Classic jazz movement.'},
+  ', il sus scorre cromaticamente. Ogni passo cambia il colore armonico mantenendo il pedale.': {en:'. Sus scrolls chromatically. Each step changes harmonic color keeping the pedal.'},
+  ', il sus si muove per quinte. Produce una sequenza di qualità armoniche regolare.': {en:'. Sus moves in fifths. Produces a regular harmonic sequence.'},
+  'Il basso rimane': {en:'Bass stays'},
+  'Il basso sale di m3, il sus avanza di un semitono. Produce variazione cromatica nel colore.': {en:'Bass rises by m3, sus advances one semitone. Produces chromatic color variation.'},
+  'Il basso si sposta per terze minori (ciclo di 4):': {en:'Bass moves in minor thirds (cycle of 4):'},
+  '. Sus invariato.': {en:'. Sus unchanged.'},
+  'cad8': {en:'Tritone substitute: a tritone away (6 semitones) in both bass and sus.', it:'Sostituto di tritono: a distanza di tritono (6 semitoni) sia nel basso che nel sus.'},
+  '12 — Pedale di basso + sus a quinte': {en:'12 — Bass pedal + sus in fifths'},
+  '13 — Moto contrario (basso sale, sus scende)': {en:'13 — Contrary motion (bass rises, sus falls)'},
+  '16 — Toni interi: basso per M2, sus per P5': {en:'16 — Whole tones: bass M2, sus P5'},
+  '19 — Pendolo: alternanza due accordi a distanza di quinta': {en:'19 — Pendulum: alternating two chords a fifth apart'},
+  '20 — Cromatismo di ritorno (sus ±1)': {en:'20 — Return chromaticism (sus ±1)'},
+  'cad12_pre': {en:'Fixed bass on ', it:'Basso fisso su '},
+  'cad12_suf': {en:', sus travels the circle of fifths in 8 steps.', it:', sus percorre il cerchio delle quinte in 8 passi.'},
+  'cad16': {en:'Bass rises in whole tones (M2), sus advances in fifths. Produces the whole-tone scale profile.', it:'Basso sale a gradi interi (M2), sus avanza per quinte. Produce il profilo della scala per toni interi.'},
+  'cad17_pre': {en:'Fixed sus on ', it:'Sus fisso su '},
+  'cad17_suf': {en:', bass travels the circle of fifths. Inverts cadence 4.', it:', basso percorre il cerchio delle quinte. Inverte la cadenza 4.'},
+  'cad18': {en:'Bass and sus descend together one semitone at a time. Same harmonic quality, growing tension downward.', it:'Basso e sus scendono insieme di un semitono per volta. Stessa qualità armonica, tensione crescente verso il basso.'},
+  'cad19_pre': {en:'Oscillation between ', it:'Oscillazione tra '},
+  'cad19_mid': {en:'and', it:'e'},
+  'cad19_suf': {en:'. Foundation of many modal ostinati.', it:'. Base di molti ostinati modali.'},
+  'cad20': {en:'From current sus, semitone above, return; semitone below, return. Typical chromatic suspension pattern.', it:'Dal sus corrente, semitono sopra, ritorno; semitono sotto, ritorno. Pattern tipico delle risoluzioni cromatiche sospese.'},
+  'cad9':  {en:'From the fifth (bass) with current sus, back to original bass with sus one tone below. Simulates V7sus4 → I.', it:'Dalla quinta (basso) con il sus attuale, ritorno al basso originale con sus un tono sotto. Simula una cadenza V7sus4 → I.'},
+  'cad10': {en:'From the fifth, deceptive resolution to a minor 3rd above the tonic. Modal color, does not truly resolve.', it:'Dalla quinta, risoluzione ingannevole su una terza minore sopra la tonica. Colore modale, non risolve veramente.'},
+  'cad11': {en:'Bass rises one semitone at a time, sus advances two families (≈M2). Maximum chromatic density.', it:'Il basso sale di un semitono per volta, il sus avanza di due famiglie (≈M2). Massima densità cromatica.'},
+  'cad13': {en:'Bass rises chromatically while sus descends by families. Maximum voice-countervoice tension.', it:'Il basso sale cromaticamente mentre il sus scende per famiglie. Produce massima tensione voce-controvoce.'},
+
+  'Il basso si sposta per terze maggiori (ciclo di 3):': {en:'Bass moves in major thirds (cycle of 3):'},
+  'Dalla quinta (basso) con il sus attuale, ritorno al basso originale con sus un tono sotto. Simula una cadenza V7sus4 → I.': {en:'From the fifth (bass) with current sus, back to original bass with sus one tone below. Simulates a V7sus4 → I cadence.'},
+  'Dalla quinta, risoluzione \"ingannevole\" su una terza minore sopra la tonica. Colore modale, non risolve veramente.': {en:'From the fifth, \"deceptive\" resolution to a minor third above the tonic. Modal color, doesn\'t truly resolve.'},
+  'Basso e sus si spostano entrambi di un semitono. Il tipo di accordo (intervallo basso-sus) non cambia — solo la tonalità.': {en:'Bass and sus both shift by one semitone. Chord type (bass-sus interval) unchanged — only tonality changes.'},
+  'Basso e sus si spostano entrambi per quinte. Ciclo armonico classico, tutto il colore rimane invariato.': {en:'Bass and sus both move in fifths. Classic harmonic cycle, color stays constant.'},
+
+  '12 famiglie sus': {en:'12 sus families'},
+  '▸ Famiglie sus completamente in': {en:'▸ Sus families fully in'},
+  'Seleziona due famiglie sus diverse.': {en:'Select two different sus families.'},
+  '1 — Basso cromatico (sus fisso)': {en:'1 — Chromatic bass (fixed sus)'},
+  '2 — Basso a quinte (sus fisso)': {en:'2 — Bass in fifths (fixed sus)'},
+  '3 — Sus cromatico (basso fisso)': {en:'3 — Chromatic sus (fixed bass)'},
+  '4 — Sus a quinte (basso fisso)': {en:'4 — Sus in fifths (fixed bass)'},
+  '5 — Moto parallelo cromatico': {en:'5 — Chromatic parallel motion'},
+  '6 — Moto parallelo per quinte': {en:'6 — Parallel motion in fifths'},
+  '7 — Obliquo: basso per terze minori, sus cromatico': {en:'7 — Oblique: bass in minor 3rds, chromatic sus'},
+  '8 — Tritono substitute': {en:'8 — Tritone substitute'},
+  '9 — Sus dominante → tonica': {en:'9 — Dominant sus → tonic'},
+  '10 — Cadenza ingannevole (→ bIII)': {en:'10 — Deceptive cadence (→ bIII)'},
+  '11 — Basso cromatico, sus per gradi': {en:'11 — Chromatic bass, sus by degrees'},
+  '12 — Sus a tritono alternato': {en:'12 — Alternating tritone sus'},
+  '13 — Moto contrario': {en:'13 — Contrary motion'},
+  '14 — Basso per terze minori (sus fisso)': {en:'14 — Bass in minor 3rds (fixed sus)'},
+  '15 — Basso per terze maggiori (sus fisso)': {en:'15 — Bass in major 3rds (fixed sus)'},
+  '16 — Toni interi (basso M2, sus P5)': {en:'16 — Whole tones (bass M2, sus P5)'},
+  '17 — Sus pedale + basso a quinte': {en:'17 — Sus pedal + bass in fifths'},
+  '18 — Discesa cromatica parallela': {en:'18 — Parallel chromatic descent'},
+  '19 — Pendolo tra due accordi a quinta': {en:'19 — Pendulum between two fifth chords'},
+  '20 — Cromatismo di ritorno ±1': {en:'20 — Return chromaticism ±1'},
+};
+
+function T(s){
+  if(currentLang==='it') return (STRINGS[s]&&STRINGS[s].it!==undefined)?STRINGS[s].it:s;
+  return (STRINGS[s] && STRINGS[s].en !== undefined) ? STRINGS[s].en : s;
+}
+
+const LANG = {
+  it: {
+    'oct-opt-1': '-2 ottave dal sus',
+    'oct-opt-2': '-1 ottava dal sus',
+    'fifths-opt-0': '0 (solo basso)',
+    'fifths-opt-1': '1 (+ quinta sotto)',
+    'fifths-opt-2': '2 (+ due quinte)',
+    'fifths-opt-3': '3 (+ tre quinte)',
+    'mappa-reset-vl': '↺ reset VL',
+    'btn-lang': '🇬🇧 EN',
+    'lbl-double': '▸ Completano un secondo sus',
+    'lbl-others': '▸ Altre note',
+  },
+  en: {
+    'oct-opt-1': '-2 oct from sus',
+    'oct-opt-2': '-1 oct from sus',
+    'fifths-opt-0': '0 (bass only)',
+    'fifths-opt-1': '1 (+ 5th below)',
+    'fifths-opt-2': '2 (+ two 5ths)',
+    'fifths-opt-3': '3 (+ three 5ths)',
+    'mappa-reset-vl': '↺ reset VL',
+    'btn-lang': '🇮🇹 IT',
+    'lbl-double': '▸ Complete a second sus',
+    'lbl-others': '▸ Other notes',
+  }
+};
+
+function applyLang(lang){
+  currentLang = lang;
+
+  // 1. Static HTML via data-it/data-en
+  document.querySelectorAll('[data-it],[data-en]').forEach(el=>{
+    const txt = currentLang==='it' ? el.dataset.it : el.dataset.en;
+    if(txt !== undefined) el.textContent = txt;
+  });
+
+  // 2. Select options
+  const selOct = document.getElementById('sel-oct');
+  if(selOct){
+    selOct.options[0].text = currentLang==='it'?'-2 ottave dal sus':'-2 oct from sus';
+    selOct.options[1].text = currentLang==='it'?'-1 ottava dal sus':'-1 oct from sus';
+  }
+  const selFifths = document.getElementById('sel-fifths');
+  if(selFifths){
+    const opts = currentLang==='it'
+      ?['0 (solo basso)','1 (+ quinta sotto)','2 (+ due quinte)','3 (+ tre quinte)']
+      :['0 (bass only)','1 (+ 5th below)','2 (+ two 5ths)','3 (+ three 5ths)'];
+    opts.forEach((t,i)=>{ if(selFifths.options[i]) selFifths.options[i].text=t; });
+  }
+
+  // 3. btn-lang
+  const btnLang=document.getElementById('btn-lang');
+  if(btnLang) btnLang.textContent = currentLang==='it'?'🇬🇧 EN':'🇮🇹 IT';
+
+  // 4. Re-render everything so all dynamic T() strings update immediately
+  if(typeof render === 'function') render();
+  if(typeof drawMappa === 'function') drawMappa();
+  if(typeof renderScala === 'function') renderScala();
+  if(window._circCenterText) window._circCenterText.textContent = T('12 famiglie sus');
+  if(window._selectCircleNode) window._selectCircleNode(window._circleSelected||0);
+  if(typeof drawDistanza === 'function') drawDistanza();
+  // Modulazione: re-render current path if visible
+  const modEl = document.getElementById('mod-result');
+  if(modEl && modEl.children.length > 0){
+    const fromSel = document.getElementById('mod-from');
+    const toSel   = document.getElementById('mod-to');
+    if(fromSel && toSel) renderModPath(parseInt(fromSel.value), parseInt(toSel.value));
+  }
+}
+
+document.getElementById('btn-lang').addEventListener('click',()=>{
+  applyLang(currentLang==='it'?'en':'it');
+});
+
 // ═══════════════════════════════════════════════════════════════
 // CORE DATA
 // ═══════════════════════════════════════════════════════════════
@@ -832,7 +1054,7 @@ function makeAddedCard(bass, susNotes, added){
   const d=document.createElement('div');
   d.className='card q-'+q;
   function updateCard(){
-    const posLabel = addedPos==='above'?'↑ sopra' : addedPos==='middle'?'↔ in mezzo':'↓ sotto';
+    const posLabel = addedPos==='above'?T('↑ sopra') : addedPos==='middle'?T('↔ in mezzo'):T('↓ sotto');
     // Build actual voicing and show notes in real pitch order (low→high)
     const voices = buildVoicing(bass, susNotes, added, addedPos, curBassOct, curFifths);
     const sortedV = [...voices].sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note));
@@ -843,13 +1065,13 @@ function makeAddedCard(bass, susNotes, added){
       return nm;
     }).join(' ');
     d.innerHTML=`
-      <div class="card-label">+ nota</div>
+      <div class="card-label">${T("+ nota")}</div>
       <div class="card-note" style="color:${qc}">${NOTE[added]}</div>
-      <div class="card-int">${INT_NAME[intv]||'?'} dal basso</div>
+      <div class="card-int">${INT_NAME[intv]||'?'} ${T("dal basso")}</div>
       <div class="card-chord" style="color:${qc}">${res.chord}</div>
       <div class="card-notes" style="font-size:7.5px;letter-spacing:.3px">${pitchStr}</div>
       <div class="card-footer">
-        <span class="ctag t-${q}">${res.tag}</span>
+        <span class="ctag t-${q}">${T(res.tag)}</span>
         <div class="card-btns">
           <button class="cpbtn pos-toggle" title="Posizione nota aggiunta">${posLabel}</button>
           <button class="cpbtn" title="Accordo">▶</button>
@@ -887,7 +1109,7 @@ function makeInvCard(origNotes, newBass, fi){
   const pitchStr=voicing.sort((a,b)=>(a.oct*12+a.note)-(b.oct*12+b.note))
     .map(v=>NOTE[v.note]+v.oct).join(' ');
   d.innerHTML=`
-    <div class="inv-label">basso: ${NOTE[newBass]}</div>
+    <div class="inv-label">${T("basso:")} ${NOTE[newBass]}</div>
     <div class="inv-name" style="color:${qc}">${name}</div>
     <div class="inv-notes">${notesStr}</div>
     <div style="font-family:var(--mono);font-size:7.5px;color:var(--faint);margin-bottom:8px">${pitchStr}</div>
@@ -922,7 +1144,7 @@ function makeMutCard(bass, origSusNotes, newSusNotes, moved, fi){
     <div class="card-chord" style="color:${qc}">${name}</div>
     <div class="mut-notes">${notesStr}</div>
     <div class="card-footer">
-      <span class="ctag t-${q}">${q}</span>
+      <span class="ctag t-${q}">${T(q)}</span>
       <div class="card-btns">
         <button class="cpbtn">▶</button>
         <button class="cpbtn">⤵</button>
@@ -980,8 +1202,8 @@ function buildCadences(bass, fi){
     });
     html+=`</div>`;
     html+=`<div class="cad-play-seq" style="display:flex;gap:6px">
-      <button class="pbtn" style="font-size:8px;padding:5px 12px" data-play-seq="chord">▶ Suona sequenza</button>
-      <button class="pbtn" style="font-size:8px;padding:5px 12px" data-play-seq="arp">⤵ Arpeggia sequenza</button>
+      <button class="pbtn" style="font-size:8px;padding:5px 12px" data-play-seq="chord">${T("▶ Suona sequenza")}</button>
+      <button class="pbtn" style="font-size:8px;padding:5px 12px" data-play-seq="arp">${T("⤵ Arpeggia sequenza")}</button>
     </div>`;
 
     div.innerHTML=html;
@@ -1025,8 +1247,8 @@ function buildCadences(bass, fi){
   const chromBass=[];
   for(let i=0;i<12;i++) chromBass.push({bass:(bass+i)%12, fi});
   cadBlock(
-    '1 — Basso cromatico (sus fisso)',
-    `Il sus rimane ${fam.r2}sus, il basso scende cromaticamente da ${NOTE[bass]}. Il nome dell'accordo cambia a ogni semitono.`,
+    T('1 — Basso cromatico (sus fisso)'),
+    `${T('Il sus rimane')} ${fam.r2}sus, ${T('cad1_mid')} ${NOTE[bass]}${T('. Il nome dell\'accordo cambia a ogni semitono.')}`,
     chromBass.slice(0,7)
   );
 
@@ -1034,8 +1256,8 @@ function buildCadences(bass, fi){
   const qBass=[];
   for(let i=0;i<7;i++) qBass.push({bass:(bass+i*7)%12, fi});
   cadBlock(
-    '2 — Basso a quinte (sus fisso)',
-    `Il sus rimane ${fam.r2}sus, il basso si muove per quinte perfette. Movimento tipico del basso jazz.`,
+    T('2 — Basso a quinte (sus fisso)'),
+    `${T('Il sus rimane')} ${fam.r2}sus${T(', il basso si muove per quinte perfette. Movimento tipico del basso jazz.')}`,
     qBass
   );
 
@@ -1043,8 +1265,8 @@ function buildCadences(bass, fi){
   const chromSus=[];
   for(let i=0;i<7;i++) chromSus.push({bass, fi:(fi+i)%12});
   cadBlock(
-    '3 — Sus cromatico (basso fisso)',
-    `Il basso rimane ${NOTE[bass]}, il sus scorre cromaticamente. Ogni passo cambia il colore armonico mantenendo il pedale.`,
+    T('3 — Sus cromatico (basso fisso)'),
+    `${T('Il basso rimane')} ${NOTE[bass]}${T(', il sus scorre cromaticamente. Ogni passo cambia il colore armonico mantenendo il pedale.')}`,
     chromSus
   );
 
@@ -1052,8 +1274,8 @@ function buildCadences(bass, fi){
   const qSus=[];
   for(let i=0;i<7;i++) qSus.push({bass, fi:(fi+i*7)%12});
   cadBlock(
-    '4 — Sus a quinte (basso fisso)',
-    `Il basso rimane ${NOTE[bass]}, il sus si muove per quinte. Produce una sequenza di qualità armoniche regolare.`,
+    T('4 — Sus a quinte (basso fisso)'),
+    `${T('Il basso rimane')} ${NOTE[bass]}${T(', il sus si muove per quinte. Produce una sequenza di qualità armoniche regolare.')}`,
     qSus
   );
 
@@ -1061,8 +1283,8 @@ function buildCadences(bass, fi){
   const parallel=[];
   for(let i=0;i<7;i++) parallel.push({bass:(bass+i)%12, fi:(fi+i)%12});
   cadBlock(
-    '5 — Moto parallelo cromatico',
-    `Basso e sus si spostano entrambi di un semitono. Il tipo di accordo (intervallo basso-sus) non cambia — solo la tonalità.`,
+    T('5 — Moto parallelo cromatico'),
+    `${T('Basso e sus si spostano entrambi di un semitono. Il tipo di accordo (intervallo basso-sus) non cambia — solo la tonalità.')}`,
     parallel
   );
 
@@ -1070,8 +1292,8 @@ function buildCadences(bass, fi){
   const parallelQ=[];
   for(let i=0;i<7;i++) parallelQ.push({bass:(bass+i*7)%12, fi:(fi+i*7)%12});
   cadBlock(
-    '6 — Moto parallelo per quinte',
-    `Basso e sus si spostano entrambi per quinte. Ciclo armonico classico, tutto il colore rimane invariato.`,
+    T('6 — Moto parallelo per quinte'),
+    `${T('Basso e sus si spostano entrambi per quinte. Ciclo armonico classico, tutto il colore rimane invariato.')}`,
     parallelQ
   );
 
@@ -1079,8 +1301,8 @@ function buildCadences(bass, fi){
   const oblique=[];
   for(let i=0;i<6;i++) oblique.push({bass:(bass+i*3)%12, fi:(fi+i)%12});
   cadBlock(
-    '7 — Obliquo: basso per terze minori, sus cromatico',
-    `Il basso sale di m3, il sus avanza di un semitono. Produce variazione cromatica nel colore.`,
+    T('7 — Obliquo: basso per terze minori, sus cromatico'),
+    `${T('Il basso sale di m3, il sus avanza di un semitono. Produce variazione cromatica nel colore.')}`,
     oblique
   );
 
@@ -1091,8 +1313,8 @@ function buildCadences(bass, fi){
     {bass, fi},
   ];
   cadBlock(
-    '8 — Tritono substitute',
-    `${fam.r2}sus/${NOTE[bass]} → sostituto di tritono → ritorno. Il sostituto è a distanza di tritono (6 semitoni) sia nel basso che nel sus.`,
+    T('8 — Tritono substitute'),
+    `${T('cad8')}`,
     tritone
   );
 
@@ -1103,8 +1325,8 @@ function buildCadences(bass, fi){
     {bass, fi:(fi+10)%12},           // orig bass, sus -M2 → might be Imaj or I6/9
   ];
   cadBlock(
-    '9 — Sus dominante → tonica',
-    `Dalla quinta (basso) con il sus attuale, ritorno al basso originale con sus un tono sotto. Simula una cadenza V7sus4 → I.`,
+    T('9 — Sus dominante → tonica'),
+    `${T('cad9')}`,
     vToI
   );
 
@@ -1114,8 +1336,8 @@ function buildCadences(bass, fi){
     {bass:(bass+3)%12, fi:(fi+3)%12},
   ];
   cadBlock(
-    '10 — Cadenza ingannevole (→ bIII)',
-    `Dalla quinta, risoluzione "ingannevole" su una terza minore sopra la tonica. Colore modale, non risolve veramente.`,
+    T('10 — Cadenza ingannevole (→ bIII)'),
+    `${T("cad10")}`,
     deceptive
   );
 
@@ -1123,8 +1345,8 @@ function buildCadences(bass, fi){
   const chromBassStepSus=[];
   for(let i=0;i<6;i++) chromBassStepSus.push({bass:(bass+i)%12, fi:(fi+i*2)%12});
   cadBlock(
-    '11 — Basso cromatico, sus per gradi',
-    `Il basso sale di un semitono per volta, il sus avanza di due famiglie (≈M2). Massima densità cromatica.`,
+    T('11 — Basso cromatico, sus per gradi'),
+    `${T('cad11')}`,
     chromBassStepSus
   );
 
@@ -1132,8 +1354,8 @@ function buildCadences(bass, fi){
   const pedal=[];
   for(let i=0;i<8;i++) pedal.push({bass, fi:(fi+i*7)%12});
   cadBlock(
-    '12 — Pedale di basso + sus a quinte',
-    `Basso fisso su ${NOTE[bass]}, sus percorre il cerchio delle quinte in 8 passi.`,
+    T('12 — Pedale di basso + sus a quinte'),
+    `${T('cad12_pre')}${NOTE[bass]}${T('cad12_suf')}`,
     pedal
   );
 
@@ -1141,8 +1363,8 @@ function buildCadences(bass, fi){
   const contrary=[];
   for(let i=0;i<7;i++) contrary.push({bass:(bass+i)%12, fi:(fi-i+12)%12});
   cadBlock(
-    '13 — Moto contrario (basso sale, sus scende)',
-    `Il basso sale cromaticamente mentre il sus scende per famiglie. Produce massima tensione voce-controvoce.`,
+    T('13 — Moto contrario (basso sale, sus scende)'),
+    `${T('cad13')}`,
     contrary
   );
 
@@ -1150,8 +1372,8 @@ function buildCadences(bass, fi){
   const bassm3=[];
   for(let i=0;i<5;i++) bassm3.push({bass:(bass+i*3)%12, fi});
   cadBlock(
-    '14 — Basso per terze minori (sus fisso)',
-    `Il basso si sposta per terze minori (ciclo di 4): ${[0,1,2,3].map(i=>NOTE[(bass+i*3)%12]).join('→')}. Sus invariato.`,
+    T('14 — Basso per terze minori (sus fisso)'),
+    `${T('Il basso si sposta per terze minori (ciclo di 4):')} ${[0,1,2,3].map(i=>NOTE[(bass+i*3)%12]).join('→')}${T('. Sus invariato.')}`,
     bassm3
   );
 
@@ -1159,8 +1381,8 @@ function buildCadences(bass, fi){
   const bassM3=[];
   for(let i=0;i<5;i++) bassM3.push({bass:(bass+i*4)%12, fi});
   cadBlock(
-    '15 — Basso per terze maggiori (sus fisso)',
-    `Il basso si sposta per terze maggiori (ciclo di 3): ${[0,1,2,3].map(i=>NOTE[(bass+i*4)%12]).join('→')}. Sus invariato.`,
+    T('15 — Basso per terze maggiori (sus fisso)'),
+    `${T('Il basso si sposta per terze maggiori (ciclo di 3):')} ${[0,1,2,3].map(i=>NOTE[(bass+i*4)%12]).join('→')}${T('. Sus invariato.')}`,
     bassM3
   );
 
@@ -1168,8 +1390,8 @@ function buildCadences(bass, fi){
   const wholetone=[];
   for(let i=0;i<7;i++) wholetone.push({bass:(bass+i*2)%12, fi:(fi+i*7)%12});
   cadBlock(
-    '16 — Toni interi: basso per M2, sus per P5',
-    `Basso sale a gradi interi (M2), sus avanza per quinte. Produce il profilo della scala per toni interi.`,
+    T('16 — Toni interi: basso per M2, sus per P5'),
+    `${T('cad16')}`,
     wholetone
   );
 
@@ -1177,8 +1399,8 @@ function buildCadences(bass, fi){
   const susped=[];
   for(let i=0;i<7;i++) susped.push({bass:(bass+i*7)%12, fi});
   cadBlock(
-    '17 — Sus pedale + basso a quinte',
-    `Sus fisso su ${fam.r2}, basso percorre il cerchio delle quinte. Inverte la cadenza 4.`,
+    T('17 — Sus pedale + basso a quinte'),
+    `${T('cad17_pre')}${fam.r2}${T('cad17_suf')}`,
     susped
   );
 
@@ -1186,8 +1408,8 @@ function buildCadences(bass, fi){
   const chromDown=[];
   for(let i=0;i<7;i++) chromDown.push({bass:(bass-i+12)%12, fi:(fi-i+12)%12});
   cadBlock(
-    '18 — Discesa cromatica parallela',
-    `Basso e sus scendono insieme di un semitono per volta. Stessa qualità armonica, tensione crescente verso il basso.`,
+    T('18 — Discesa cromatica parallela'),
+    `${T('cad18')}`,
     chromDown
   );
 
@@ -1195,8 +1417,8 @@ function buildCadences(bass, fi){
   const pend2a={bass, fi}, pend2b={bass:(bass+7)%12, fi:(fi+7)%12};
   const pendulum=[pend2a,pend2b,pend2a,pend2b,pend2a,pend2b];
   cadBlock(
-    '19 — Pendolo: alternanza due accordi a distanza di quinta',
-    `Oscillazione tra ${chordName(bass,fi)} e ${chordName((bass+7)%12,(fi+7)%12)}. Base di molti ostinati modali.`,
+    T('19 — Pendolo: alternanza due accordi a distanza di quinta'),
+    `${T('cad19_pre')}${chordName(bass,fi)} ${T('cad19_mid')} ${chordName((bass+7)%12,(fi+7)%12)}${T('cad19_suf')}`,
     pendulum
   );
 
@@ -1209,8 +1431,8 @@ function buildCadences(bass, fi){
     {bass, fi},
   ];
   cadBlock(
-    '20 — Cromatismo di ritorno (sus ±1)',
-    `Dal sus corrente, semitono sopra, ritorno; semitono sotto, ritorno. Pattern tipico delle risoluzioni cromatiche sospese.`,
+    T('20 — Cromatismo di ritorno (sus ±1)'),
+    `${T('cad20')}`,
     chromRes
   );
 }
@@ -1237,10 +1459,10 @@ function render(){
   document.getElementById('base-bar').innerHTML=`
     <div>
       <div class="base-name" style="color:${qc}">${name}</div>
-      <div class="base-sub">${fam.r2}sus / ${NOTE[bass]}&nbsp;&nbsp;·&nbsp;&nbsp;intervallo: ${INT_NAME[i]||'?'}</div>
+      <div class="base-sub">${fam.r2}sus / ${NOTE[bass]}&nbsp;&nbsp;·&nbsp;&nbsp;${T("intervallo:")} ${INT_NAME[i]||'?'}</div>
     </div>
     <div class="base-notes-row">${notePills}</div>
-    <span class="quality-tag t-${q}">${q}</span>`;
+    <span class="quality-tag t-${q}">${T(q)}</span>`;
 
   // ── TAB: NOTE AGGIUNTE ──────────────────────────────────────
   const missing=[]; for(let n=0;n<12;n++) if(!allNotes.includes(n)) missing.push(n);
@@ -1253,17 +1475,17 @@ function render(){
   const gd=document.getElementById('grid-double');
   const go=document.getElementById('grid-others');
   gd.innerHTML=''; go.innerHTML='';
-  document.getElementById('lbl-double').textContent=`▸ Completano un secondo sus (${doubles.length})`;
-  document.getElementById('lbl-others').textContent=`▸ Altre note aggiungibili (${others.length})`;
+  document.getElementById('lbl-double').textContent=`${T('▸ Completano un secondo sus')} (${doubles.length})`;
+  document.getElementById('lbl-others').textContent=`${T('▸ Altre note aggiungibili')} (${others.length})`;
   doubles.forEach(n=>gd.appendChild(makeAddedCard(bass,susNotes,n)));
   others.forEach(n=>go.appendChild(makeAddedCard(bass,susNotes,n)));
   document.getElementById('insight-added').innerHTML=`<b>INSIGHT</b><br><br>
-    ${doubles.length} note completano un secondo sus.
-    Delle ${others.length} restanti: 
-    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='stabile').length} stabili,
-    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='esteso').length} estese/modali,
-    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='dominante').length} dominanti,
-    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='cluster').length} cluster.`;
+    ${doubles.length} ${T("note completano un secondo sus.")}
+    ${T('Delle')} ${others.length} ${T('restanti:')} 
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='stabile').length} ${T("stabili,")}
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='esteso').length} ${T("estese/modali,")}
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='dominante').length} ${T("dominanti,")}
+    ${others.filter(n=>identifyAdded(bass,susNotes,n).type==='cluster').length} ${T('cluster.')}`;
 
   // ── TAB: MUTAZIONI ──────────────────────────────────────────
   const gm1=document.getElementById('grid-mut1');
@@ -1322,9 +1544,9 @@ function render(){
     if(n===bass) card.style.border='2px solid #111';
     gi.appendChild(card);
   });
-  document.getElementById('insight-inv').innerHTML=`<b>INVERSIONI</b><br><br>
-    L'accordo ${name} ha ${allNotes.length} note e quindi ${allNotes.length} inversioni possibili.
-    Ogni inversione cambia il colore armonico dal punto di vista del basso, mantenendo le stesse note superiori.`;
+  document.getElementById('insight-inv').innerHTML=`<b>${T('INVERSIONI')}</b><br><br>
+    ${name} ${T('ha')} ${allNotes.length} ${T('note e quindi')} ${allNotes.length} ${T('inversioni possibili.')}
+    ${T('Ogni inversione cambia il colore armonico dal punto di vista del basso, mantenendo le stesse note superiori.')}`;
 
   // ── TAB: CADENZE ────────────────────────────────────────────
   buildCadences(bass, fi);
@@ -1472,7 +1694,7 @@ function makeTriadCard(bass, origSusNotes, root, triad){
     <div class="card-chord" style="color:${qc};font-size:12px">${name}</div>
     <div class="mut-notes">${NOTE[root]} ${triadNotes.map(n=>NOTE[n]).join(' ')}</div>
     <div class="card-footer">
-      <span class="ctag" style="background:#f0f0f0;color:#555">${triad.label} (${dist} note cambiate)</span>
+      <span class="ctag" style="background:#f0f0f0;color:#555">${triad.label} (${dist} ${T("note cambiate")})</span>
       <div class="card-btns">
         <button class="cpbtn">▶</button>
         <button class="cpbtn">⤵</button>
@@ -1891,7 +2113,9 @@ function initMappa(){
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R,fill:'none',stroke:'#ddd','stroke-width':'1','stroke-dasharray':'3,6'}));
 
   // Center
-  svg.appendChild(svgEl('text',{x:CX,y:CY-7,'text-anchor':'middle','dominant-baseline':'middle','font-size':'10',fill:'#aaa','font-family':'IBM Plex Mono,monospace'},'12 famiglie sus'));
+  const _circCenterText = svgEl('text',{x:CX,y:CY-7,'text-anchor':'middle','dominant-baseline':'middle','font-size':'10',fill:'#aaa','font-family':'IBM Plex Mono,monospace'},T('12 famiglie sus'));
+  svg.appendChild(_circCenterText);
+  window._circCenterText = _circCenterText;
   svg.appendChild(svgEl('text',{x:CX,y:CY+8,'text-anchor':'middle','dominant-baseline':'middle','font-size':'8',fill:'#bbb','font-family':'IBM Plex Mono,monospace'},'Xsus2 = (X+P5)sus4'));
 
   // Edges
@@ -1946,7 +2170,7 @@ function initMappa(){
   }
 
   function selectCircleNode(pos){
-    circSelected=pos;
+    circSelected=pos; window._circleSelected=pos;
     resetCircle();
     const fam=FAM[POS[pos].famIdx];
     const notesStr=getSusNotes(POS[pos].famIdx).map(n=>NOTE[n]).join(', ');
@@ -1975,7 +2199,7 @@ function initMappa(){
       const dir=mv.semUp>0?`+${mv.semUp}st ↑m3`:`${mv.semUp}st ↓m3`;
       return `<div class="circ-move-row">
         <span class="circ-chord-badge">${targetFam.r2}sus2 = ${targetFam.r4}sus4</span>
-        <span style="color:var(--muted)">muovi</span>
+        <span style="color:var(--muted)">${T("muovi")}</span>
         <span class="circ-note-from">${NOTE[mv.fromNote]}</span>
         <span>→</span>
         <span class="circ-note-to">${NOTE[mv.toNote]}</span>
@@ -1990,15 +2214,16 @@ function initMappa(){
         <span style="color:#994400;font-weight:700">${fam.r4}sus4</span>
         <span class="circ-notes-badge">{ ${notesStr} }</span>
       </div>
-      <div style="font-size:9px;color:var(--muted);margin-bottom:10px">ogni passo sposta una nota di m3 (3 semitoni)</div>
-      <div style="font-size:9px;color:#555;margin-bottom:4px">↻ clockwise</div>
+      <div style="font-size:9px;color:var(--muted);margin-bottom:10px">${T("ogni passo sposta una nota di m3 (3 semitoni)")}</div>
+      <div style="font-size:9px;color:#555;margin-bottom:4px">↻ ${T("clockwise")}</div>
       ${mvHtml(cwMv,cwFam)}
-      <div style="font-size:9px;color:#555;margin:8px 0 4px">↺ counter-clockwise</div>
+      <div style="font-size:9px;color:#555;margin:8px 0 4px">↺ ${T("counter-clockwise")}</div>
       ${mvHtml(ccwMv,ccwFam)}
-      <div class="circ-legend">↻ nota scende m3 · root sale P4 &nbsp;|&nbsp; ↺ nota sale m3 · root scende P4</div>`;
+      <div class="circ-legend">${T("↻ nota scende m3 · root sale P4")} &nbsp;|&nbsp; ${T("↺ nota sale m3 · root scende P4")}</div>`;
   }
 
   selectCircleNode(0);
+  window._selectCircleNode = selectCircleNode;
 })();
 
 
@@ -2058,11 +2283,11 @@ function renderDecomp(noteSet){
   const label=document.getElementById('decomp-label');
   grid.innerHTML=''; insight.style.display='none';
   if(!noteSet||noteSet.length<3){
-    label.textContent='▸ Inserisci almeno 3 note';
+    label.textContent=T('▸ Inserisci almeno 3 note');
     return;
   }
   const unique=[...new Set(noteSet)];
-  label.textContent=`▸ Coppie sus che coprono {${unique.map(n=>NOTE[n]).join(' ')}}`;
+  label.textContent=`${currentLang==='it'?'▸ Coppie sus che coprono':'▸ Sus pairs covering'} {${unique.map(n=>NOTE[n]).join(' ')}}`;
 
   const results=[];
   for(let a=0;a<12;a++) for(let b=a+1;b<12;b++){
@@ -2094,19 +2319,19 @@ function renderDecomp(noteSet){
     const sharedStr=r.shared.length?r.shared.map(n=>NOTE[n]).join(' '):'–';
     const extraStr=r.uncovered.length?r.uncovered.map(n=>NOTE[n]).join(' '):'nessuna';
     d.innerHTML=`
-      <div class="card-label">coppia sus</div>
+      <div class="card-label">${T("coppia sus")}</div>
       <div class="card-chord" style="font-size:12px">${FAM[r.a].r2}sus + ${FAM[r.b].r2}sus</div>
       <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin:4px 0">
         {${susAN.map(n=>NOTE[n]).join(' ')}} + {${susBN.map(n=>NOTE[n]).join(' ')}}
       </div>
       <div style="font-family:var(--mono);font-size:8px;margin:3px 0">
-        <span style="color:#0a5e3a">●</span> shared: ${sharedStr}
+        <span style="color:#0a5e3a">●</span> ${T("shared:")} ${sharedStr}
       </div>
       <div style="font-family:var(--mono);font-size:8px;margin:3px 0;color:var(--muted)">
-        extra: ${extraStr}
+        ${T("extra:")} ${extraStr}
       </div>
       <div class="card-footer" style="margin-top:8px">
-        <span class="ctag" style="background:#f0f0f0;color:#555">${r.cofDist} passi COF</span>
+        <span class="ctag" style="background:#f0f0f0;color:#555">${r.cofDist} ${T("passi COF")}</span>
         <div class="card-btns">
           <button class="cpbtn">▶ A</button>
           <button class="cpbtn">▶ B</button>
@@ -2133,10 +2358,10 @@ function renderDecomp(noteSet){
   });
 
   insight.style.display='block';
-  insight.innerHTML=`<b>DECOMPOSIZIONE</b><br><br>
-    Trovate <b>${results.length}</b> coppie sus che coprono l'accordo.<br>
-    La più vicina sul cerchio: <b>${FAM[results[0].a].r2}sus + ${FAM[results[0].b].r2}sus</b> (${results[0].cofDist} passi).
-    ${results[0].shared.length?'Nota condivisa: <b>'+results[0].shared.map(n=>NOTE[n]).join(' ')+'</b>.':'Nessuna nota condivisa — due sus paralleli.'}`;
+  insight.innerHTML=`<b>${T("DECOMPOSIZIONE")}</b><br><br>
+    ${T("Trovate")} <b>${results.length}</b> ${T("coppie sus che coprono l'accordo.")}<br>
+    ${T("La più vicina sul cerchio:")} <b>${FAM[results[0].a].r2}sus + ${FAM[results[0].b].r2}sus</b> (${results[0].cofDist} ${T("passi COF")}).
+    ${results[0].shared.length?T("Nota condivisa:")+' <b>'+results[0].shared.map(n=>NOTE[n]).join(' ')+'</b>.':T("Nessuna nota condivisa — due sus paralleli.")}`;
 }
 
 function initDecomp(){
@@ -2202,7 +2427,7 @@ function drawDistSus(canvas){
 
   _drawDistGrid(ctx,W,H,LABEL,S);
   ctx.fillStyle='#999'; ctx.font='7.5px IBM Plex Mono,monospace'; ctx.textAlign='left';
-  ctx.fillText('0=nessuna  1=1 nota  2=2 note  3=stessa famiglia. Click per sentire.',LABEL,H-3);
+  ctx.fillText(T('0=nessuna  1=1 nota  2=2 note  3=stessa famiglia. Click per sentire.'),LABEL,H-3);
 }
 
 function drawDistChord(canvas){
@@ -2263,7 +2488,7 @@ function drawDistChord(canvas){
 
   _drawDistGrid(ctx,W,H,LABEL_H,S,LABEL_W);
   ctx.fillStyle='#999'; ctx.font='7.5px IBM Plex Mono,monospace'; ctx.textAlign='left';
-  ctx.fillText('Note in comune con: '+refName+' {'+refNotes.map(n=>NOTE[n]).join(' ')+'}  Click per sentire.',LABEL_W,H-3);
+  ctx.fillText(T('Note in comune con:')+' '+refName+' {'+refNotes.map(n=>NOTE[n]).join(' ')+'}  Click per sentire.',LABEL_W,H-3);
 }
 
 function _drawDistGrid(ctx,W,H,LABEL,S,LABEL_W){
@@ -2284,14 +2509,14 @@ function initDistanza(){
     distMode='sus';
     document.getElementById('dist-mode-sus').classList.add('active');
     document.getElementById('dist-mode-chord').classList.remove('active');
-    document.getElementById('dist-desc').textContent='Note in comune tra coppie di famiglie sus. Click per sentire.';
+    document.getElementById('dist-desc').textContent=T('Note in comune tra coppie di famiglie sus. Click per sentire.');
     drawDistanza();
   });
   document.getElementById('dist-mode-chord').addEventListener('click',()=>{
     distMode='chord';
     document.getElementById('dist-mode-chord').classList.add('active');
     document.getElementById('dist-mode-sus').classList.remove('active');
-    document.getElementById('dist-desc').textContent='Note in comune tra tutti gli accordi (basso+sus) e la selezione corrente. Click per sentire.';
+    document.getElementById('dist-desc').textContent=T('Note in comune tra tutti gli accordi (basso+sus) e la selezione corrente. Click per sentire.');
     drawDistanza();
   });
 
@@ -2372,9 +2597,9 @@ function renderScalaSus(){
   }
 
   document.getElementById('scala-label').textContent=
-    `▸ Famiglie sus completamente in ${NOTE[root]} ${modeName}  (${inFamilies.length}/12)`;
+    `${T('▸ Famiglie sus completamente in')} ${NOTE[root]} ${modeName}  (${inFamilies.length}/12)`;
   document.getElementById('scala-out-label').textContent=
-    `▸ Fuori scala — note estranee in rosso  (${outFamilies.length}/12)`;
+    `${T('▸ Fuori scala — note estranee in rosso')}  (${outFamilies.length}/12)`;
 
   // Render IN-scale cards (only scale notes, clean)
   inFamilies.forEach(f=>{
@@ -2383,7 +2608,7 @@ function renderScalaSus(){
     d.className='card';
     d.style.borderLeft='3px solid var(--stabile)';
     d.innerHTML=`
-      <div class="card-label">✓ dentro</div>
+      <div class="card-label">✓ ${T("dentro")}</div>
       <div class="card-chord" style="color:var(--stabile)">${FAM[f].r2}sus2</div>
       <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px">${FAM[f].r4}sus4</div>
       <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:#222;margin-bottom:8px">${fn.map(n=>NOTE[n]).join(' · ')}</div>
@@ -2413,11 +2638,11 @@ function renderScalaSus(){
     d.style.borderLeft='3px solid var(--faint)';
     d.style.opacity='0.8';
     d.innerHTML=`
-      <div class="card-label" style="color:var(--muted)">✗ fuori (${outNotes.length} nota${outNotes.length>1?'e':''})</div>
+      <div class="card-label" style="color:var(--muted)">✗ ${T('fuori')} (${outNotes.length} ${T(outNotes.length>1?'note':'nota')})</div>
       <div class="card-chord" style="color:var(--muted)">${FAM[f].r2}sus2</div>
       <div style="font-family:var(--mono);font-size:9px;color:var(--faint);margin-bottom:4px">${FAM[f].r4}sus4</div>
       <div style="font-family:var(--mono);font-size:10px;margin-bottom:4px">${noteLabels}</div>
-      <div style="font-family:var(--mono);font-size:7.5px;color:var(--dominante);margin-bottom:8px">estranee: ${outNotes.map(n=>NOTE[n]).join(', ')}</div>
+      <div style="font-family:var(--mono);font-size:7.5px;color:var(--dominante);margin-bottom:8px">${T('estranee:')} ${outNotes.map(n=>NOTE[n]).join(', ')}</div>
       <div class="card-btns">
         <button class="cpbtn">▶</button><button class="cpbtn">⤵</button>
       </div>`;
@@ -2486,7 +2711,7 @@ function renderScalaChord(){
       ctx.fillStyle='#e8e5e0';
       ctx.fillRect(0,y,W,4);
       ctx.fillStyle='#aaa'; ctx.font='7px IBM Plex Mono,monospace'; ctx.textAlign='left';
-      ctx.fillText('── basso fuori scala ──',LABEL_W+4,y+2);
+      ctx.fillText(T('── basso fuori scala ──'),LABEL_W+4,y+2);
       row++; return;
     }
 
@@ -2529,7 +2754,7 @@ function renderScalaChord(){
   ctx.beginPath();ctx.moveTo(0,LABEL_H);ctx.lineTo(W,LABEL_H);ctx.stroke();
 
   ctx.fillStyle='#888'; ctx.font='7.5px IBM Plex Mono,monospace'; ctx.textAlign='left';
-  ctx.fillText('Verde=tutte note in scala. Righe grigie=basso fuori scala.',LABEL_W,H-3);
+  ctx.fillText(T('Verde=tutte note in scala. Righe grigie=basso fuori scala.'),LABEL_W,H-3);
 
   // Store layout for click handler
   canvas._bassOrder=bassOrder;
@@ -2686,7 +2911,7 @@ function renderModPath(fromFi, toFi, dir, label){
   block.className='cadence-block';
 
   let html=`<div class="cad-title">${label}</div>`;
-  html+=`<div class="cad-desc" style="margin-bottom:12px">${path.length-1} passo/i sul cerchio delle quinte</div>`;
+  html+=`<div class="cad-desc" style="margin-bottom:12px">${path.length-1} ${T('passo/i sul cerchio delle quinte')}</div>`;
   html+=`<div class="cad-seq" style="flex-wrap:wrap;">`;
 
   path.forEach((fi,i)=>{
@@ -2704,8 +2929,8 @@ function renderModPath(fromFi, toFi, dir, label){
   });
   html+=`</div>`;
   html+=`<div style="display:flex;gap:6px;margin-top:10px">
-    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-seq">▶ Suona tutto</button>
-    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-arp">⤵ Arpeggia tutto</button>
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-seq">${T('▶ Suona tutto')}</button>
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-arp">${T('⤵ Arpeggia tutto')}</button>
   </div>`;
 
   block.innerHTML=html;
@@ -2766,7 +2991,7 @@ function renderModulazione(){
   btnBar.innerHTML='';
 
   if(fromFi===toFi){
-    document.getElementById('mod-content').innerHTML='<div class="insight">Seleziona due famiglie sus diverse.</div>';
+    document.getElementById('mod-content').innerHTML=`<div class="insight">${T('Seleziona due famiglie sus diverse.')}</div>`;
     return;
   }
 
@@ -2779,12 +3004,12 @@ function renderModulazione(){
   const intName=INTERVAL_NAMES[modInterval]||modInterval+'st';
 
   const options=[];
-  if(fwdReaches) options.push({label:`↑ ${intName} (${fwdPath.length-1} passi)`,path:fwdPath});
-  if(bwdReaches&&JSON.stringify(bwdPath)!==JSON.stringify(fwdPath)) options.push({label:`↓ ${intName} (${bwdPath.length-1} passi)`,path:bwdPath});
+  if(fwdReaches) options.push({label:`↑ ${intName} (${fwdPath.length-1} ${T('passi')})`,path:fwdPath});
+  if(bwdReaches&&JSON.stringify(bwdPath)!==JSON.stringify(fwdPath)) options.push({label:`↓ ${intName} (${bwdPath.length-1} ${T('passi')})`,path:bwdPath});
   if(!fwdReaches&&!bwdReaches){
     // interval doesn't reach toFi — show the full cycle from fromFi
     const cycle=getPathByInterval(fromFi,fromFi,modInterval,1);
-    options.push({label:`Ciclo completo per ${intName} (${cycle.length-1} passi)`,path:cycle});
+    options.push({label:`${T('Ciclo completo per')} ${intName} (${cycle.length-1} ${T('passi')})`,path:cycle});
   }
 
   options.forEach((opt,idx)=>{
@@ -2827,8 +3052,8 @@ function renderModPathFromArray(fromFi, toFi, path, label){
     if(i<path.length-1) html+=`<div class="cad-arrow">→</div>`;
   });
   html+=`</div><div style="display:flex;gap:6px;margin-top:10px">
-    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-seq">▶ Tutto</button>
-    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-arp">⤵ Arpeggia</button>
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-seq">${T('▶ Tutto')}</button>
+    <button class="pbtn" style="font-size:8px;padding:5px 12px" id="mod-play-arp">${T("⤵ Arpeggia")}</button>
   </div>`;
   block.innerHTML=html;
 
@@ -2911,7 +3136,9 @@ function initNewTabs(){
 const PIANO_WHITES = [0,2,4,5,7,9,11]; // C D E F G A B (pitch classes of white keys)
 const PIANO_BLACKS = [1,3,null,6,8,10,null]; // C# D# - F# G# A# - (indexed by white gap)
 // 3 octaves: 2,3,4,5 = octaves shown
-const PIANO_OCTS = [2,3,4,5];
+// Piano octaves — extend dynamically in drawPiano based on available width
+const PIANO_OCTS_BASE = [2,3,4,5];
+let PIANO_OCTS = PIANO_OCTS_BASE;
 
 // Active notes: Map of "note-oct" → { until: timestamp, vel }
 const pianoActive = new Map();
@@ -2937,6 +3164,21 @@ function drawPiano(){
   const canvas = document.getElementById('piano-canvas');
   const W = canvas.clientWidth, H = canvas.clientHeight;
   if(!W||!H) return;
+
+  // Extend octaves to fill available width, min key width ~18px, max ~52px
+  const minKW = 18, maxKW = 52;
+  let nOcts = 4;
+  // Try to fit as many octaves as look good
+  for(let n=7; n>=2; n--){
+    const kw = W / (n*7);
+    if(kw >= minKW && kw <= maxKW){ nOcts = n; break; }
+    if(kw > maxKW && n===2){ nOcts=2; break; }
+  }
+  // Always show at least oct 3 and 4 (middle range)
+  const midOct = 3;
+  const startOct = Math.max(1, midOct - Math.floor((nOcts-1)/2));
+  PIANO_OCTS = Array.from({length:nOcts},(_,i)=>startOct+i);
+
   canvas.width = W * devicePixelRatio;
   canvas.height = H * devicePixelRatio;
   canvas.style.width = W+'px'; canvas.style.height = H+'px';
@@ -3058,6 +3300,9 @@ render();
 initMappa();
 initNewTabs();
 initPiano();
+
+
+
 </script>
 </body>
 </html>
