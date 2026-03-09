@@ -1759,7 +1759,7 @@ function drawMappa(){
   const totalW = Math.max(container.clientWidth - 4, 700);
   
   const LABEL_W = 90, CELL_W = Math.max(Math.floor((totalW - LABEL_W) / 12), 58);
-  const HEADER_H = 56, CELL_H = 30;
+  const HEADER_H = 70, CELL_H = 30;
   _mL=LABEL_W; _mCW=CELL_W; _mHH=HEADER_H; _mCH=CELL_H; // store for click handler
   const W = LABEL_W + 12*CELL_W;
   const H = HEADER_H + 12*CELL_H;
@@ -1790,10 +1790,18 @@ function drawMappa(){
     ctx2.fillStyle = '#1144aa';
     ctx2.font = 'bold 9px IBM Plex Mono, monospace';
     ctx2.textAlign = 'center';
-    ctx2.fillText(FAM[fi].r2+'sus2', x+CELL_W/2, HEADER_H/2-5);
+    ctx2.fillText(FAM[fi].r2+'sus2', x+CELL_W/2, 12);
     ctx2.fillStyle = '#994400';
     ctx2.font = '8px IBM Plex Mono, monospace';
-    ctx2.fillText(FAM[fi].r4+'sus4', x+CELL_W/2, HEADER_H/2+9);
+    ctx2.fillText(FAM[fi].r4+'sus4', x+CELL_W/2, 26);
+    // Sus notes row
+    const sn2 = getSusNotes(fi);
+    ctx2.fillStyle = '#666';
+    ctx2.font = '7px IBM Plex Mono, monospace';
+    ctx2.fillText(sn2.map(n=>NOTE[n]).join(' '), x+CELL_W/2, 40);
+    // divider line under notes
+    ctx2.strokeStyle = '#ddd'; ctx2.lineWidth = 0.5;
+    ctx2.beginPath(); ctx2.moveTo(x, 46); ctx2.lineTo(x+CELL_W, 46); ctx2.stroke();
   });
   
   // Row labels + cells
